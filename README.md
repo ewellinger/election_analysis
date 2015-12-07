@@ -13,15 +13,47 @@ Preliminary news outlets to scrape include:
 * Fox News
 * MSNBC
 * CNN
-* ABC News
 * NBC News
 * The Wall Street Journal
 * NPR
 * BBC
 * Al Jazeera
+* The Guardian
 
-Articles pertaining to the general election will then be added to a Mongo Database with metadata and raw HTML for further analysis.  A article will be classified as pertaining to the general election if the headline of the article contains one or more of the following keywords:
+Articles pertaining to the general election will then be added to a Mongo Database with metadata and raw HTML for further analysis.  A article will be classified as pertaining to the general election if the body of the article contains one or more of the following keywords:
 ```python
-keywords = ['clinton', 'sanders', 'trump', 'perry', 'carson', "o'malley",
-            'cristie', 'bush', '']
+keywords = ['jeb bush', 'carson', 'christie', 'cruz', 'fiorina', 'jim gilmore', 'lindsey graham', 'huckabee', 'kasich', 'george pataki', 'rand paul', 'rubio', 'santorum', 'donald trump', 'rick perry', 'scott walker', 'jindal', 'hillary clinton', "o'malley", 'omalley', 'sanders', 'jim webb', 'chafee', 'lessig']
 ```
+
+
+### Current Candidates
+Republican
+* Jeb Bush
+* Ben Carson
+* Chris Christie
+* Ted Cruz
+* Carly Fiorina
+* Jim Gilmore
+* Lindsey Graham
+* Mike Huckabee
+* John Kasich
+* George Pataki
+* Rand Paul
+* Marco Rubio
+* Rick Santorum
+* Donald Trump
+
+Republican - Withdrew Before Primaries
+* Rick Perry
+* Scott Walker
+* Bobby Jindal
+
+Democrat
+* Hillary Clinton
+* Martin O'Malley
+* Bernie Sanders
+
+Democrat - Withdrew Before Primaries
+* Jim Webb
+* Lincoln Chafee
+* Lawrence Lessig
