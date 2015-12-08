@@ -2,7 +2,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import json
 import threading
-from keywords import get_keywords_2016, get_dates
+from load_data import get_keywords_2016, get_dates
 
 
 def get_urls_from_search(driver, searchterm, date, attempt=0):
