@@ -87,7 +87,7 @@ if __name__=='__main__':
     # Create the Firefox driver for selenium
     # driver = webdriver.Firefox()
 
-    dates = get_dates(start_mon=1, end_mon=2, end_day=7)
+    dates = get_dates(end_mon=12)
 
     # Initialize empty lists for urls to be appended to
     good_urls, bad_urls = set(), set()
@@ -95,13 +95,12 @@ if __name__=='__main__':
     # for searchterm in searchterms:
     #     good_urls, bad_search = get_urls(driver, searchterm, dates, good_urls, bad_urls)
 
-    # First 8 search terms
-    good_urls, bad_urls = concurrent_get_urls(searchterms[0:2], dates, good_urls, bad_urls)
-    good_urls, bad_urls = concurrent_get_urls(searchterms[2:4], dates, good_urls, bad_urls)
-    # # Next 8 search terms
-    # good_urls, bad_urls = concurrent_get_urls(searchterms[8:16], dates, good_urls, bad_urls)
-    # # Final 8 search terms
-    # good_urls, bad_urls = concurrent_get_urls(searchterms[16:], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(searchterms[0:4], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(searchterms[4:8], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(searchterms[8:12], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(searchterms[12:16], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(searchterms[16:20], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(searchterms[20:], dates, good_urls, bad_urls)
 
     # Convert each set to a list and write to a txt file
     with open('./url_files/fox_article_urls_2016.txt', 'w') as f:
