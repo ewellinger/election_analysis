@@ -1,9 +1,8 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
-import itertools
 import json
 import threading
-from keywords import get_keywords_2016
+from keywords import get_keywords_2016, get_dates
 
 
 def get_urls_from_search(driver, searchterm, date, attempt=0):
@@ -73,6 +72,7 @@ def concurrent_get_urls(searchterms, dates, good_urls, bad_urls):
     for result in results:
         good_urls = good_urls.union(result[0])
         bad_urls = bad_urls.union(result[1])
+    for driver in drivers: driver.close()
     return good_urls, bad_urls
 
 
@@ -81,24 +81,13 @@ def concurrent_get_urls(searchterms, dates, good_urls, bad_urls):
 
 if __name__=='__main__':
     # Get all the keywords to search for
-    # searchterms = get_keywords_2016()
-    searchterms = ['trump', 'carson', 'clinton']
+    searchterms = get_keywords_2016()
+    # searchterms = ['trump', 'carson', 'clinton']
 
     # Create the Firefox driver for selenium
     # driver = webdriver.Firefox()
 
-    # Create list of invalid dates to exclude from search
-    bad_dates = ['02-30', '02-31', '04-31', '06-31', '09-31', '11-31']
-    bad_dates = ['2015-' + date for date in bad_dates]
-
-    # Create list of all dates to search over
-    # Note: This is only going up to December.  Will redo the scraping at a later date to get the days in December
-    months, days = range(11, 12), range(1, 32)
-    months = ['0' + str(month) if len(str(month)) == 1 else str(month) for month in months]
-    days = ['0' + str(day) if len(str(day)) == 1 else str(day) for day in days]
-    dates = itertools.product(months, days)
-    dates = ['2015-' + date[0] + '-' + date[1] for date in dates]
-    dates = [date for date in dates if date not in bad_dates]
+    dates = get_dates(start_mon=1, end_mon=2, end_day=7)
 
     # Initialize empty lists for urls to be appended to
     good_urls, bad_urls = set(), set()
@@ -106,12 +95,15 @@ if __name__=='__main__':
     # for searchterm in searchterms:
     #     good_urls, bad_search = get_urls(driver, searchterm, dates, good_urls, bad_urls)
 
-    good_urls, bad_urls = concurrent_get_urls(searchterms, dates, good_urls, bad_urls)
+    # First 8 search terms
+    good_urls, bad_urls = concurrent_get_urls(searchterms[0:2], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(searchterms[2:4], dates, good_urls, bad_urls)
+    # # Next 8 search terms
+    # good_urls, bad_urls = concurrent_get_urls(searchterms[8:16], dates, good_urls, bad_urls)
+    # # Final 8 search terms
+    # good_urls, bad_urls = concurrent_get_urls(searchterms[16:], dates, good_urls, bad_urls)
 
     # Convert each set to a list and write to a txt file
     with open('./url_files/fox_article_urls_2016.txt', 'w') as f:
         f.write(json.dumps(list(good_urls)))
-        f.close()
-    with open('./url_files/bad_fox_article_urls_2016.txt', 'w') as f:
-        f.write(json.dumps(list(bad_urls)))
         f.close()
