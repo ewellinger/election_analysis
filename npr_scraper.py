@@ -1,8 +1,10 @@
 from pymongo import MongoClient
-import os
 from requests import get
-import json
 from unidecode import unidecode
+from load_data import get_keywords_2016, get_dates
+import json
+import threading
+import os
 # Import NPR API Access key from zsh profile
 api_key = os.environ['NPR_ACCESS_KEY']
 
@@ -20,7 +22,8 @@ def single_query(searchterm, date, start_num=0):
 def extract_info(article):
     '''
     INPUT: dict object with output from the api
-    OUTPUT: dict object to insert into mongodb
+    OUTPUT: bool if extraction was successful or not,
+            dict object to insert into mongodb
     '''
     headline = unidecode(article['title']['$text'])
     date_published = str(article['pubDate']['$text'])
@@ -28,33 +31,63 @@ def extract_info(article):
         author = [str(author['name']['$text']) for author in article['byline']]
     except:
         author = None
-    url = str(article['link'][0]['$text'])
-    article_text = unidecode(' '.join([line.get('$text', '\n') for line in article['text']['paragraph']]))
+    try:
+        url = str(article['link'][0]['$text'])
+    except:
+        return False, ''
+    try:
+        article_text = unidecode(' '.join([line.get('$text', '\n') for line in article['text']['paragraph']]))
+    except:
+        return False, ''
     insert = {'url': url,
               'source': 'npr',
               'headline': headline,
               'date_published': date_published,
               'author': author,
               'article_text': article_text}
-    return insert
+    return True, insert
 
 
-def scrape_npr(tab, searchterm, dates):
+def scrape_npr(tab, searchterm, dates, page_num=0):
     articles = []
+    num_bad_extractions = 0
     for date in dates:
         response = single_query(searchterm, date)
         if 'message' in response.keys():
-            print (searchterm, date)
-            print response['message'][0]['text']['$text']
+            pass
         else:
             for article in response['list']['story']:
                 articles.append(article)
-    return [extract_info(article) for article in articles]
-    # return articles
+    for article in articles:
+        insert = extract_info(article)
+        if insert[0] and not already_exists(tab, insert[1]['url']):
+            tab.insert_one(insert[1])
+        if not insert[0]:
+            num_bad_extractions += 1
+    return num_bad_extractions
+
+
+def thread_scrape_npr(tab, searchterm, dates):
+    self = threading.current_thread()
+    self.result = scrape_npr(tab, searchterm, dates)
 
 
 def already_exists(tab, url):
     return bool(tab.find({'url': url}).count())
+
+
+def concurrent_scrape_npr(tab, searchterms, dates):
+    threads = []
+    for searchterm in searchterms:
+        thread = threading.Thread(target=thread_scrape_npr,
+                                  args=(tab, searchterm, dates))
+        threads.append(thread)
+    for thread in threads: thread.start()
+    for thread in threads: thread.join()
+    num_bad_extractions = 0
+    for thread in threads:
+        num_bad_extractions += thread.result
+    return num_bad_extractions
 
 
 if __name__=='__main__':
@@ -65,6 +98,7 @@ if __name__=='__main__':
     # Initialize table
     tab = db['articles']
 
+    dates = get_dates(end_mon=12)
+    keywords = get_keywords_2016()
 
-    # articles = [article for article in response['list']['story']]
-    articles = scrape_npr(tab, 'obama', ['2015-03-23', '2015-03-24', '2015-03-25', '2015-03-27'])
+    num_bad_extractions = concurrent_scrape_npr(tab, keywords, dates)

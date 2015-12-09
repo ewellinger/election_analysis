@@ -7,15 +7,18 @@ from load_data import get_keywords_2016, get_dates
 
 def get_urls_from_search(driver, searchterm, date, attempt=0):
     searchterm = searchterm.replace(' ', '%20')
-    url = 'http://www.foxnews.com/search-results/search?q={0}&ss=fn&section.path=fnc/politics&type=story&min_date={1}&max_date={1}&start=0'.format(searchterm, date)
+    url = 'http://www.foxnews.com/search-results/search?q={0}&ss=fn&section.path=fnc/politics&type=story&min_date={1}&max_date={1}&start=0'.format(
+        searchterm, date)
 
     # Get the html from the site and create a BeautifulSoup object from it
     driver.get(url)
     soup = BeautifulSoup(driver.page_source, 'html.parser')
 
     try:
-        # Get the number of search results.  If greater than 10 we'll need to loop through subsequent pages to get the additional urls
-        num_found = int(soup.find('span', attrs = {'ng-bind': 'numFound'}).contents[0])
+        # Get the number of search results.  If greater than 10 we'll need to
+        # loop through subsequent pages to get the additional urls
+        num_found = int(
+            soup.find('span', attrs={'ng-bind': 'numFound'}).contents[0])
 
         if num_found <= 10:
             articles = soup.findAll('div', class_='search-article ng-scope')
@@ -30,7 +33,8 @@ def get_urls_from_search(driver, searchterm, date, attempt=0):
                 link = driver.find_element_by_link_text(str(page))
                 link.click()
                 soup = BeautifulSoup(driver.page_source, 'html.parser')
-                articles = soup.findAll('div', class_='search-article ng-scope')
+                articles = soup.findAll(
+                    'div', class_='search-article ng-scope')
                 for tag in articles:
                     urls.append(str(tag.find('a').get('href')))
             return True, urls
@@ -65,42 +69,43 @@ def concurrent_get_urls(searchterms, dates, good_urls, bad_urls):
         thread = threading.Thread(target=thread_get_urls,
                                   args=(drivers[idx], searchterm, dates, good_urls, bad_urls))
         threads.append(thread)
-    for thread in threads: thread.start()
-    for thread in threads: thread.join()
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
     results = []
-    for thread in threads: results.append(thread.result)
+    for thread in threads:
+        results.append(thread.result)
     for result in results:
         good_urls = good_urls.union(result[0])
         bad_urls = bad_urls.union(result[1])
-    for driver in drivers: driver.close()
+    for driver in drivers:
+        driver.close()
     return good_urls, bad_urls
 
 
-
-
-
-if __name__=='__main__':
+if __name__ == '__main__':
     # Get all the keywords to search for
     searchterms = get_keywords_2016()
-    # searchterms = ['trump', 'carson', 'clinton']
 
-    # Create the Firefox driver for selenium
-    # driver = webdriver.Firefox()
-
+    # Get dates to search over (up to December)
     dates = get_dates(end_mon=12)
 
     # Initialize empty lists for urls to be appended to
     good_urls, bad_urls = set(), set()
 
-    # for searchterm in searchterms:
-    #     good_urls, bad_search = get_urls(driver, searchterm, dates, good_urls, bad_urls)
-
-    good_urls, bad_urls = concurrent_get_urls(searchterms[0:4], dates, good_urls, bad_urls)
-    good_urls, bad_urls = concurrent_get_urls(searchterms[4:8], dates, good_urls, bad_urls)
-    good_urls, bad_urls = concurrent_get_urls(searchterms[8:12], dates, good_urls, bad_urls)
-    good_urls, bad_urls = concurrent_get_urls(searchterms[12:16], dates, good_urls, bad_urls)
-    good_urls, bad_urls = concurrent_get_urls(searchterms[16:20], dates, good_urls, bad_urls)
-    good_urls, bad_urls = concurrent_get_urls(searchterms[20:], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(
+        searchterms[0:4], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(
+        searchterms[4:8], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(
+        searchterms[8:12], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(
+        searchterms[12:16], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(
+        searchterms[16:20], dates, good_urls, bad_urls)
+    good_urls, bad_urls = concurrent_get_urls(
+        searchterms[20:], dates, good_urls, bad_urls)
 
     # Convert each set to a list and write to a txt file
     with open('./url_files/fox_article_urls_2016.txt', 'w') as f:

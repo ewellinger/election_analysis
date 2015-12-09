@@ -16,7 +16,7 @@ Preliminary news outlets to scrape include:
 * NBC News
 * The Wall Street Journal
 * NPR
-* BBC
+* ~~BBC~~ (No good way to scrape, API is only open to BBC Employees)
 * ~~Al Jazeera~~ (No way to scrape)
 * The Guardian
 
