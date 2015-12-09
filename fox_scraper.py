@@ -20,7 +20,10 @@ def add_to_mongo(tab, url):
         author = soup.find('a', attrs={'rel': 'author'}).text
     except:
         author = None
-    article_text = unidecode(soup.find('div', attrs={'class': 'article-text'}).text)
+    try:
+        article_text = unidecode(soup.find('div', attrs={'class': 'article-text'}).text)
+    except:
+        return url
 
     insert = {'url': url,
               'source': 'foxnews',
@@ -49,7 +52,6 @@ def load_urls(filename):
 if __name__=='__main__':
     # Create MongoClient
     client = MongoClient()
-
     # Initialize the Database
     db = client['election_analysis']
     # Initialize table
@@ -58,7 +60,7 @@ if __name__=='__main__':
     urls = load_urls('./url_files/fox_article_urls_2016.txt')
 
     bad_urls = []
-    for url in urls[0:10]:
+    for url in urls:
         result = add_to_mongo(tab, url)
         if result:
             bad_urls.append(result)
