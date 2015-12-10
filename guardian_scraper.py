@@ -37,7 +37,7 @@ def extract_info(article):
     except:
         return False, ''
     try:
-        article_text = unidecode(article['blocks']['body'][0]['bodyTextSummary'])
+        article_text = '\n'.join([unidecode(text_block['bodyTextSummary']) for text_block in article['blocks']['body']])
     except:
         return False, ''
     insert = {'url': url,
@@ -89,4 +89,6 @@ if __name__=='__main__':
 
     for searchterm in searchterms:
         print searchterm
-        scrape_guardian(tab, searchterm, dates)
+        # Guardian doesn't like the ' in o'malley
+        if searchterm != "o'malley":
+            scrape_guardian(tab, searchterm, dates)
