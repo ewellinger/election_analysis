@@ -8,7 +8,7 @@ The purpose of this project is to scrape a variety of news sites for articles co
 Time permitting, similar analysis will be done on previous general election cycles (e.g. 2007 for the election cycle of Obama's first election).
 
 Preliminary news outlets to scrape include:
-* The New York Times
+* The New York Times (In progress)
 * The Washington Post
 * Fox News (Done)
 * MSNBC
@@ -22,7 +22,11 @@ Preliminary news outlets to scrape include:
 
 Articles pertaining to the general election will then be added to a Mongo Database with metadata and raw HTML for further analysis.  A article will be classified as pertaining to the general election if the body of the article contains one or more of the following keywords:
 ```python
-keywords = ['jeb bush', 'carson', 'christie', 'cruz', 'fiorina', 'jim gilmore', 'lindsey graham', 'huckabee', 'kasich', 'george pataki', 'rand paul', 'rubio', 'santorum', 'donald trump', 'rick perry', 'scott walker', 'jindal', 'hillary clinton', "o'malley", 'omalley', 'sanders', 'jim webb', 'chafee', 'lessig']
+keywords = ['jeb bush', 'carson', 'christie', 'cruz', 'fiorina', 'jim gilmore',
+            'lindsey graham', 'huckabee', 'kasich', 'george pataki',
+            'rand paul', 'rubio', 'santorum', 'donald trump', 'rick perry',
+            'scott walker', 'jindal', 'clinton', "o'malley", 'omalley',
+            'sanders', 'jim webb', 'chafee', 'lessig']
 ```
 
 

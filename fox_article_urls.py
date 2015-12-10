@@ -89,7 +89,7 @@ if __name__ == '__main__':
     searchterms = get_keywords_2016()
 
     # Get dates to search over (up to December)
-    dates = get_dates(end_mon=12)
+    dates = get_dates(end_mon=11)
 
     # Initialize empty lists for urls to be appended to
     good_urls, bad_urls = set(), set()
