@@ -8,28 +8,19 @@ def get_keywords_2016():
     return keywords
 
 
-def get_dates(start_mon=1, end_mon=13, start_day=1, end_day=31):
-    bad_dates = ['02-30', '02-31', '04-31', '06-31', '09-31', '11-31']
-    bad_dates = ['2015-' + date for date in bad_dates]
+def get_dates(start_mon=1, end_mon=12, start_day=1, end_day=None):
+    if not end_day:
+        end_day = days_in_month[end_mon]
+    start_date = '2015-{0}-{1}'.format(get_num_str(start_mon), get_num_str(start_day))
+    end_date = '2015-{0}-{1}'.format(get_num_str(end_mon), get_num_str(end_day))
 
-    # Create list of all dates to search over
-    months, days = range(start_mon, end_mon), range(start_day, end_day)
-    months = ['0' + str(month) if len(str(month)) == 1 else str(month) for month in months]
-    days = ['0' + str(day) if len(str(day)) == 1 else str(day) for day in days]
-    dates = itertools.product(months, days)
-    dates = ['2015-' + date[0] + '-' + date[1] for date in dates]
-    dates = [date for date in dates if date not in bad_dates]
-    return dates
+    date_range = pd.date_range(start_date, end_date, freq='D')
+    date_range = [date.strftime('%Y-%m-%d') for date in date_range]
+    return date_range
 
 
 def get_week_tuples(start_mon=1, end_mon=12):
-    days_in_month = {1: 31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
-    def get_num_str(num):
-        if len(str(num)) == 1:
-            return '0' + str(num)
-        else:
-            return str(num)
-    date = ('2015-'+get_num_str(start_mon)+'-01', '2015-'+get_num_str(end_mon)+ '-' + get_num_str(days_in_month[end_mon]))
+    date = ('2015-{}-01'.format(get_num_str(start_mon)), '2015-{0}-{1}'.format(get_num_str(end_mon), get_num_str(days_in_month[end_mon])))
     date_range = pd.date_range(date[0], date[1], freq='W')
     date_range = [date.strftime('%Y-%m-%d') for date in date_range]
     result = [('2015-'+get_num_str(start_mon)+'-01', date_range[0])]
@@ -37,3 +28,11 @@ def get_week_tuples(start_mon=1, end_mon=12):
         result.append(i)
     result.append((date_range[-1], '2015-'+get_num_str(end_mon)+ '-' + get_num_str(days_in_month[end_mon])))
     return result
+
+days_in_month = {1: 31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
+
+def get_num_str(num):
+    if len(str(num)) == 1:
+        return '0' + str(num)
+    else:
+        return str(num)

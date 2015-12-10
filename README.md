@@ -18,7 +18,7 @@ Preliminary news outlets to scrape include:
 * NPR (Done)
 * ~~BBC~~ (No good way to scrape, API is only open to BBC Employees)
 * ~~Al Jazeera~~ (No way to scrape)
-* The Guardian
+* The Guardian (Done)
 
 Articles pertaining to the general election will then be added to a Mongo Database with metadata and raw HTML for further analysis.  A article will be classified as pertaining to the general election if the body of the article contains one or more of the following keywords:
 ```python
