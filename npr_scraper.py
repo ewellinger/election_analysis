@@ -2,7 +2,6 @@ from pymongo import MongoClient
 from requests import get
 from unidecode import unidecode
 from load_data import get_keywords_2016, get_dates
-import json
 import threading
 import os
 # Import NPR API Access key from zsh profile
