@@ -107,7 +107,7 @@ if __name__ == '__main__':
     good_urls, bad_urls = concurrent_get_urls(
         searchterms[20:], dates, good_urls, bad_urls)
 
-    # Convert each set to a list and write to a txt file
+    # Convert good_urls set to a list and write to a txt file
     with open('./url_files/fox_article_urls_2016.txt', 'w') as f:
         f.write(json.dumps(list(good_urls)))
         f.close()
