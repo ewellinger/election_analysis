@@ -1,4 +1,5 @@
 import pandas as pd
+from unidecode import unidecode
 
 
 # Defines all the keywords associated with the 2016 election cycle
@@ -48,3 +49,10 @@ def load_urls(filename):
     urls = [url.replace('"', '') for url in urls]
     urls = [url.replace(' ', '') for url in urls]
     return urls
+
+
+def parse_str(x):
+    if type(x) == unicode:
+        return unidecode(x)
+    else:
+        return str(x)
