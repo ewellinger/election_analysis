@@ -3,9 +3,6 @@ from requests import get
 from load_data import get_keywords_2016, get_dates
 import json
 import os
-# Import WSJ Access Credentials from zsh profile
-# user_name = os.environ['WSJ_USER_ACCOUNT']
-# password = os.environ['WSJ_PASSWORD']
 
 
 def single_query(date):

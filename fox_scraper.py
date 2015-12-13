@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from requests import get
 import json
 from unidecode import unidecode
+from load_data import load_urls
 
 
 def add_to_mongo(tab, url):
@@ -37,16 +38,6 @@ def add_to_mongo(tab, url):
 
 def already_exists(tab, url):
     return bool(tab.find({'url': url}).count())
-
-def load_urls(filename):
-    urls = ''
-    with open(filename, 'r') as f:
-        for line in f:
-            urls += line
-    urls = urls[1: -1].split(',')
-    urls = [url.replace('"', '') for url in urls]
-    urls = [url.replace(' ', '') for url in urls]
-    return urls
 
 
 if __name__=='__main__':

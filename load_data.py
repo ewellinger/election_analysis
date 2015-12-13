@@ -1,4 +1,3 @@
-import itertools
 import pandas as pd
 
 
@@ -31,8 +30,21 @@ def get_week_tuples(start_mon=1, end_mon=12):
 
 days_in_month = {1: 31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
 
+
 def get_num_str(num):
     if len(str(num)) == 1:
         return '0' + str(num)
     else:
         return str(num)
+
+
+# Load list from file
+def load_urls(filename):
+    urls = ''
+    with open(filename, 'r') as f:
+        for line in f:
+            urls += line
+    urls = urls[1: -1].split(',')
+    urls = [url.replace('"', '') for url in urls]
+    urls = [url.replace(' ', '') for url in urls]
+    return urls
