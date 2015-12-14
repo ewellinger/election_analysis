@@ -31,10 +31,10 @@ def add_to_mongo(tab, url):
               'headline': headline,
               'date_published': date_published,
               'author': author,
-              'article_text': article_text,
-              'raw_html': html.content}
+              'article_text': article_text}
     tab.insert_one(insert)
     return False
+
 
 def already_exists(tab, url):
     return bool(tab.find({'url': url}).count())

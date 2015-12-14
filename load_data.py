@@ -8,6 +8,35 @@ def get_keywords_2016():
     return keywords
 
 
+def get_canidate_names_2016():
+    keywords = ['jeb bush',
+                'ben carson',
+                'chris christie',
+                'ted cruz',
+                'carly fiorina',
+                'jim gilmore',
+                'lindsey graham',
+                'mike huckabee',
+                'john kasich',
+                'george pataki',
+                'rand paul',
+                'marco rubio',
+                'rick santorum',
+                'donald trump',
+                'rick perry',
+                'scott walker',
+                'bobby jindal',
+                'hillary clinton', 'hillary rodham clinton',
+                "martin o'malley",
+                'martin omalley',
+                'bernie sanders',
+                'jim webb',
+                'lincoln chafee',
+                'lawrence lessig',
+                'joe biden', 'joseph biden']
+    return '|'.join(keywords)
+
+
 def get_dates(start_mon=1, end_mon=12, start_day=1, end_day=None):
     if not end_day:
         end_day = days_in_month[end_mon]

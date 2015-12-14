@@ -45,7 +45,7 @@ def extract_info(tab, driver, url):
         return False, ''
 
     try:
-        date_published = soup.find('time', attrs={'class': 'timestamp'}).text.replace('\n', '').strip()
+        date_published = soup.find('time', attrs={'class': 'timestamp'}).text.replace('\n', '').replace('Updated', '').strip()
     except:
         print 'WARNING: Error extracting date_published'
         print url
@@ -105,3 +105,5 @@ if __name__=='__main__':
     driver = log_in_wsj()
 
     inserts, good_urls, bad_urls = scrape_wsj(tab, driver, urls, good_urls, bad_urls)
+
+    driver.close()
