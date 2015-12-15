@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
-import re
+import re, string
 from pymongo import MongoClient
 from load_data import get_canidate_names_2016, parse_str
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.corpus import stopwords
 
 
 ''' Convert date_published attribute to a datetime object within the Mongo shell
@@ -31,12 +33,17 @@ def read_mongo(tab, query={}, no_id=True):
     return df
 
 
-def clean_df(df, columns, keywords):
+def clean_df(df, columns, keywords, lemmatize_text=True):
     # Remove emails, lower text, and convert to str
-    df['article_text'] = df['article_text'].apply(remove_emails).apply(parse_str).apply(lambda x: x.lower().strip('advertisement'))
+    df['article_text'] = df['article_text'].apply(remove_emails).apply(parse_str).apply(lambda x: x.lower().strip('advertisement').translate(None, string.punctuation))
 
     # Filter out any record in dataframe where the article_text doesn't contain any of the keywords
     df = df.loc[df['article_text'].str.contains(keywords), :]
+
+    # Lemmatize article text if lemmatize_text is set to True
+    if lemmatize_text:
+        df['lemmatized_text'] = df['article_text'].apply(lemmatize_article)
+        columns.append('lemmatized_text')
 
     # Sort by the date_published and reset the index
     df = df.sort_values(by='date_published').reset_index(drop=True)
@@ -45,9 +52,13 @@ def clean_df(df, columns, keywords):
     return df[columns]
 
 
-
 def remove_emails(doc):
     return re.sub(r'[\w\.-]+@[\w\.-]+', '', doc)
+
+
+def lemmatize_article(article):
+    stop_words = set(stopwords.words('english'))
+    return ' '.join([WordNetLemmatizer().lemmatize(w) for w in article.split() if w not in stop_words])
 
 
 if __name__=='__main__':
@@ -64,3 +75,5 @@ if __name__=='__main__':
     df = read_mongo(tab)
 
     df = clean_df(df, columns, keywords)
+
+    df.to_pickle('./election_data.pkl')
