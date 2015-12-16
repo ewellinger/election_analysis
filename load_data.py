@@ -1,5 +1,6 @@
 import pandas as pd
 from unidecode import unidecode
+from nltk.corpus import stopwords
 
 
 # Defines all the keywords associated with the 2016 election cycle
@@ -85,3 +86,7 @@ def parse_str(x):
         return unidecode(x)
     else:
         return str(x)
+
+
+def stop_words():
+    return stopwords.words('english') + ['guardian', 'new york times', 'nyt', 'wall street journal', 'wsj', 'mr', 'mrs', 'ms', 'gov', 'sen', 'rep', 'said', 'fox', 'would', 'wouldn', 'ha', 'wa', 'campaign', 'candidate']
