@@ -2,9 +2,8 @@ import pandas as pd
 import numpy as np
 import re, string
 from pymongo import MongoClient
-from load_data import get_canidate_names_2016, parse_str
+from load_data import get_canidate_names_2016, parse_str, stop_words
 from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.corpus import stopwords
 
 
 ''' Convert date_published attribute to a datetime object within the Mongo shell
@@ -57,8 +56,8 @@ def remove_emails(doc):
 
 
 def lemmatize_article(article):
-    stop_words = set(stopwords.words('english'))
-    return ' '.join([WordNetLemmatizer().lemmatize(w) for w in article.split() if w not in stop_words])
+    stopwords = stop_words()
+    return ' '.join([en.lemma(w) for w in article.split() if w not in stopwords])
 
 
 if __name__=='__main__':
