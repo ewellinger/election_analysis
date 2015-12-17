@@ -3,7 +3,7 @@ import numpy as np
 import re, string
 from pymongo import MongoClient
 from load_data import get_canidate_names_2016, parse_str, stop_words
-from nltk.stem.wordnet import WordNetLemmatizer
+import pattern.en as en
 
 
 ''' Convert date_published attribute to a datetime object within the Mongo shell
@@ -34,7 +34,7 @@ def read_mongo(tab, query={}, no_id=True):
 
 def clean_df(df, columns, keywords, lemmatize_text=True):
     # Remove emails, lower text, and convert to str
-    df['article_text'] = df['article_text'].apply(remove_emails).apply(parse_str).apply(lambda x: x.lower().strip('advertisement').translate(None, string.punctuation))
+    df['article_text'] = df['article_text'].apply(remove_email_nums).apply(parse_str).apply(lambda x: x.lower().strip('advertisement').translate(None, string.punctuation))
 
     # Filter out any record in dataframe where the article_text doesn't contain any of the keywords
     df = df.loc[df['article_text'].str.contains(keywords), :]
@@ -51,7 +51,8 @@ def clean_df(df, columns, keywords, lemmatize_text=True):
     return df[columns]
 
 
-def remove_emails(doc):
+def remove_email_nums(doc):
+    doc = re.sub(r'[0-9]', '', doc)
     return re.sub(r'[\w\.-]+@[\w\.-]+', '', doc)
 
 

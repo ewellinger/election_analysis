@@ -89,4 +89,4 @@ def parse_str(x):
 
 
 def stop_words():
-    return stopwords.words('english') + ['guardian', 'new york times', 'nyt', 'wall street journal', 'wsj', 'mr', 'mrs', 'ms', 'gov', 'sen', 'rep', 'said', 'fox', 'would', 'wouldn', 'ha', 'wa', 'campaign', 'candidate']
+    return stopwords.words('english') + ['guardian', 'new york times', 'nyt', 'wall street journal', 'wsj', 'mr', 'mrs', 'ms', 'gov', 'sen', 'rep', 'said', 'fox', 'would', 'campaign', 'candidate']

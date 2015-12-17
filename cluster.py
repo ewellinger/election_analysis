@@ -40,7 +40,7 @@ def create_document_vector(df, max_features=5000, max_df=1, min_df=1):
     return tfid, X, feature_names
 
 
-def cluster_articles(df, n_clusters, max_features=10000, max_df=1, min_df=1,  num_words=15, num_headlines=None):
+def cluster_articles(df, n_clusters, max_features=5000, max_df=1, min_df=1,  num_words=15, num_headlines=None):
     tfid, X, feature_names = create_document_vector(df, max_features=max_features, max_df=max_df, min_df=min_df)
     kmeans = KMeans(n_clusters=n_clusters)
     kmeans.fit(X)
@@ -51,11 +51,36 @@ def cluster_articles(df, n_clusters, max_features=10000, max_df=1, min_df=1,  nu
     return tfid, kmeans, labels, words, headlines
 
 
-def nmf_articles():
-    pass
+def nmf_articles(df, n_topics, n_features=5000, n_top_words=20, random_state=None, max_df=1, min_df=1):
+    tfid, X, feature_names = create_document_vector(df, max_features=n_features, max_df=max_df, min_df=min_df)
+
+    nmf = NMF(n_components=n_topics, random_state=random_state, alpha=.1, l1_ratio=0.5).fit(X)
+    W = nmf.transform(X)
+
+    labels = np.array([np.argmax(row) for row in W])
+    # rel_importance will give a sense of how well a article can be attributed to a given topic
+    rel_importance = np.array([row[np.argmax(row)] / row.sum() for row in W])
+    words = top_words(nmf.components_, feature_names, n_top_words)
+
+    return tfid, nmf, X, W, labels, rel_importance, words, feature_names
 
 
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
-    tfid, kmeans, labels, top_words, headlines = cluster_articles(df, n_clusters=14, max_features=15000, num_words=20, max_df=0.95, min_df=2)
+    # tfid, kmeans, labels, top_words, headlines = cluster_articles(df, n_clusters=14, max_features=15000, num_words=20, max_df=0.95, min_df=2)
+
+    # for n_topics in xrange(6, 20):
+    #     tfid, nmf, X, W, labels, rel_importance, topic_words, feature_names = nmf_articles(df, n_topics=n_topics, n_features=15000, random_state=1, max_df=0.95, min_df=2)
+    #     importances = np.array([rel_importance[labels == idx].mean() for idx in xrange(n_topics)])
+    #     print n_topics, len(importances[importances > 0.55])
+
+    tfid, nmf, X, W, labels, rel_importance, topic_words, feature_names = nmf_articles(df, n_topics=12, n_features=15000, random_state=1, max_df=0.95, min_df=2)
+    topic_size = [len(labels[labels == idx]) for idx in xrange(len(topic_words))]
+    sort = np.argsort(topic_size)
+
+    for idx in sort:
+        print topic_words[idx]
+        print 'Number of articles in topic: {}'.format(topic_size[idx])
+        print rel_importance[labels == idx].mean()
+        print '\n'
