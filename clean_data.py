@@ -52,12 +52,16 @@ def clean_df(df, columns, keywords, lemmatize_text=True):
 
 
 def remove_email_nums(doc):
+    # Remove any numbers from article text
     doc = re.sub(r'[0-9]', '', doc)
+    # Return article text with any email addresses removed
     return re.sub(r'[\w\.-]+@[\w\.-]+', '', doc)
 
 
 def lemmatize_article(article):
+    # Load in stopwords from load_data
     stopwords = stop_words()
+    # Lemmatize article by running each word through the pattern.en lemmatizer and only including it in the resulting text if the word doesn't appear in the set of stopwords
     return ' '.join([en.lemma(w) for w in article.split() if w not in stopwords])
 
 
@@ -70,6 +74,8 @@ if __name__=='__main__':
     tab = db['articles']
 
     keywords = get_canidate_names_2016()
+
+    # Columns to keep in the resulting dataframe
     columns = ['date_published', 'source', 'url', 'author', 'content_type', 'headline', 'article_text']
 
     df = read_mongo(tab)
