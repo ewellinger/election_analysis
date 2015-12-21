@@ -3,7 +3,9 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 from sklearn.decomposition import NMF
+import nimfa
 from load_data import stop_words
+from itertools import permutations
 
 
 def top_words(clusters, feature_names, num_words):
@@ -65,22 +67,59 @@ def nmf_articles(df, n_topics, n_features=5000, n_top_words=20, random_state=Non
     return tfid, nmf, X, W, labels, rel_importance, words, feature_names
 
 
+def topic_coherence(df, topic_words, e=0.01, num_top_words=10):
+    '''
+    Using the UMass topic coherence as definied in http://anthology.aclweb.org/D/D12/D12-1087.pdf
+    '''
+    if not num_top_words:
+        num_top_words = len(topic_words)
+    result = 0.0
+    perm = permutations(topic_words[:num_top_words], 2)
+    while True:
+        try:
+            word1, word2 = perm.next()
+            result += coherence_score(df, word1, word2, e)
+        except:
+            return result
+
+
+def coherence_score(df, word1, word2, e):
+    return np.log((len(df[df['lemmatized_text'].str.contains(word1) & df['lemmatized_text'].str.contains(word2)]) + e) / df['lemmatized_text'].str.contains(word2).sum())
+
+
+
+
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
     # tfid, kmeans, labels, top_words, headlines = cluster_articles(df, n_clusters=14, max_features=15000, num_words=20, max_df=0.95, min_df=2)
 
-    # for n_topics in xrange(6, 20):
-    #     tfid, nmf, X, W, labels, rel_importance, topic_words, feature_names = nmf_articles(df, n_topics=n_topics, n_features=15000, random_state=1, max_df=0.95, min_df=2)
-    #     importances = np.array([rel_importance[labels == idx].mean() for idx in xrange(n_topics)])
-    #     print n_topics, len(importances[importances > 0.55])
+    # tfid, nmf, X, W, labels, rel_importance, topic_words, feature_names = nmf_articles(df, n_topics=14, n_features=15000, random_state=1, max_df=0.95, min_df=2)
+    #
+    # coherence = []
+    # for idx, words in enumerate(topic_words):
+    #     num_articles = len(labels[labels == idx])
+    #     mean_purity = rel_importance[labels == idx].mean()
+    #     std_purity = rel_importance[labels == idx].std()
+    #     print 'Label {}'.format(idx)
+    #     print words
+    #     print 'Number of articles in topic: {}'.format(num_articles)
+    #     print 'Mean Purity: {}'.format(mean_purity)
+    #     print 'Std Purity: {}'.format(std_purity)
+    #     print 'Normalized Purity: {}'.format(mean_purity / std_purity)
+    #     coherence.append(topic_coherence(df, words))
+    #     print 'Topic Coherence: {}'.format(coherence[idx])
+    #     print '\n'
+    # print np.mean(coherence)
 
-    tfid, nmf, X, W, labels, rel_importance, topic_words, feature_names = nmf_articles(df, n_topics=12, n_features=15000, random_state=1, max_df=0.95, min_df=2)
-    topic_size = [len(labels[labels == idx]) for idx in xrange(len(topic_words))]
-    sort = np.argsort(topic_size)
-
-    for idx in sort:
-        print topic_words[idx]
-        print 'Number of articles in topic: {}'.format(topic_size[idx])
-        print rel_importance[labels == idx].mean()
-        print '\n'
+    '''
+    I'm going to try looking over many different number of latent topics and see what that does to the average topic coherence for each model.
+    '''
+    avg_coherence = []
+    for n_topics in xrange(12, 51):
+        print '{} Number of Topics Processing...'.format(n_topics)
+        tfid, nmf, X, W, labels, rel_importance, topic_words, feature_names = nmf_articles(df, n_topics=n_topics, n_features=15000, random_state=1, max_df=0.95, min_df=2)
+        coherence = []
+        for words in topic_words:
+            coherence.append(topic_coherence(df, words))
+        avg_coherence.append(np.mean(coherence))
