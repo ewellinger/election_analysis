@@ -4,7 +4,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 from sklearn.decomposition import NMF
 from load_data import stop_words
-from itertools import permutations
 
 
 def top_words(clusters, feature_names, num_words):
@@ -63,22 +62,11 @@ def sum_squared_err(nmf, X, labels):
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
-    # tfid, kmeans, labels, top_words, headlines = cluster_articles(df, n_clusters=14, max_features=15000, num_words=20, max_df=0.95, min_df=2)
+    tfid, nmf, X, W, labels, rel_importance, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=80, n_features=15000, random_state=1, max_df=0.95, min_df=2)
 
-    tfid, nmf, X, W, labels, rel_importance, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=20, n_features=15000, random_state=1, max_df=0.95, min_df=2)
-    print 'Clustering Done...'
-    # coherence = []
-    # for idx, words in enumerate(topic_words):
-    #     num_articles = len(labels[labels == idx])
-    #     mean_purity = rel_importance[labels == idx].mean()
-    #     std_purity = rel_importance[labels == idx].std()
-    #     print 'Label {}'.format(idx)
-    #     print words
-    #     print 'Number of articles in topic: {}'.format(num_articles)
-    #     print 'Mean Purity: {}'.format(mean_purity)
-    #     print 'Std Purity: {}'.format(std_purity)
-    #     print 'Normalized Purity: {}'.format(mean_purity / std_purity)
-    #     coherence.append(topic_coherence(df, words))
-    #     print 'Topic Coherence: {}'.format(coherence[idx])
-    #     print '\n'
-    # print np.mean(coherence)
+    for idx, words in enumerate(topic_words):
+        num_articles = len(labels[labels == idx])
+        print 'Label {}'.format(idx)
+        print words
+        print 'Number of articles in topic: {}'.format(num_articles)
+        print '\n'
