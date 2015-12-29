@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from datetime import date
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -22,14 +23,14 @@ def plot_candidate_percentages(df, candidates):
     plt.show()
 
 
-def count_articles_by_time(df, searchterm=None, source=False, freq='W', normalize=False, show=True):
+def count_articles_by_time(df, searchterm=None, source=False, freq='W', normalize=False, show=True, marker='o', year=False):
     if source:
         outlets = [('nyt', 'New York Times'), ('foxnews', 'Fox News'), ('npr', 'NPR'), ('guardian', 'The Guardian'), ('wsj', 'Wall Street Journal')]
     if not searchterm and not source:
         ts = pd.Series([1], index=df['date_published']).resample(freq, how='sum')
         fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
-        ts.plot()
+        ts.plot(marker=marker)
         plt.xlabel('Date Published')
         plt.ylabel('Article Count (freq={})'.format(freq))
     elif not searchterm and source:
@@ -39,7 +40,8 @@ def count_articles_by_time(df, searchterm=None, source=False, freq='W', normaliz
         fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
         for idx, ts in enumerate(timeseries):
-            ts.plot(label=outlets[idx][1])
+            if len(ts):
+                ts.plot(marker=marker, label=outlets[idx][1])
         plt.xlabel('Date Published', fontsize=12)
         if normalize:
             plt.ylabel('Article Frequency (freq = {})'.format(freq), fontsize=12)
@@ -50,7 +52,7 @@ def count_articles_by_time(df, searchterm=None, source=False, freq='W', normaliz
         ts = pd.Series(df['lemmatized_text'].str.contains(searchterm).astype('int').values, index=df['date_published']).resample(freq, how='sum')
         fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
-        ts.plot()
+        ts.plot(marker=marker)
         plt.xlabel('Date Published', fontsize=12)
         plt.ylabel('Article Count (freq={})'.format(freq), fontsize=12)
         plt.title("Articles Containing '{}'".format(searchterm), fontsize=14)
@@ -61,7 +63,8 @@ def count_articles_by_time(df, searchterm=None, source=False, freq='W', normaliz
         fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
         for idx, ts in enumerate(timeseries):
-            ts.plot(label=outlets[idx][1])
+            if len(ts):
+                ts.plot(marker=marker, label=outlets[idx][1])
         plt.xlabel('Date Published', fontsize=12)
         if normalize:
             plt.ylabel('Article Frequency (freq = {})'.format(freq), fontsize=12)
@@ -70,6 +73,11 @@ def count_articles_by_time(df, searchterm=None, source=False, freq='W', normaliz
         plt.legend(loc='best')
         plt.title("Articles Containing '{}'".format(searchterm), fontsize=14)
         plt.legend(loc='best')
+    if year:
+        plt.xlim((date(2014, 12, 20), date(2016, 1, 15)))
+        if not normalize:
+            axis = plt.axis()
+            plt.ylim((0, axis[3] + 1))
     if show:
         plt.show()
 

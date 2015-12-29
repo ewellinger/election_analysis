@@ -64,9 +64,15 @@ if __name__=='__main__':
 
     tfid, nmf, X, W, labels, rel_importance, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=80, n_features=15000, random_state=1, max_df=0.95, min_df=2)
 
+    outlets = [('nyt', 'NYT'), ('foxnews', 'FOX'), ('npr', 'NPR'), ('guardian', 'GUA'), ('wsj', 'WSJ')]
     for idx, words in enumerate(topic_words):
         num_articles = len(labels[labels == idx])
+        articles_by_source = [float(len(df.loc[(labels == idx) & (df['source'] == outlet).values, :])) / num_articles for outlet in zip(*outlets)[0]]
         print 'Label {}'.format(idx)
         print words
         print 'Number of articles in topic: {}'.format(num_articles)
+        print '\t'.join(['{0}: {1:.2f}'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], articles_by_source)])
+        normalized = [percent / len(df.loc[df['source'] == outlet, :]) for percent, outlet in zip(articles_by_source, zip(*outlets)[0])]
+        normalized = [percent / np.sum(normalized) for percent in normalized]
+        print '\t'.join(['{0}: {1:.2f}'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], normalized)])
         print '\n'

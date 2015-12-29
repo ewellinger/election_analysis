@@ -53,6 +53,19 @@ def document_word_count(X, reverse_lookup, word1, word2=None):
         return len(np.where((X[:, reverse_lookup[word1]] > 0).toarray())[0])
 
 
+def make_coherence_plot(n_topics, coherence, show=False):
+    fig = plt.figure(figsize=(12, 8))
+    plt.plot(n_topics, coherence)
+    plt.xlabel('Number of Topics')
+    plt.ylabel('Avg Coherence Score')
+    plt.suptitle('Average Coherence Score Among Topics', fontsize=18)
+    plt.subplots_adjust(left=0.08, bottom=0.09, right=0.95, top=0.91, hspace=0.16)
+    if show:
+        plt.show()
+    else:
+        plt.savefig('./plots/nmf_coherence.png', dpi=350)
+
+
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
@@ -60,7 +73,7 @@ if __name__=='__main__':
 
     avg_coherence = [get_avg_coherence(df, n_topic) for n_topic in num_topics]
 
-
+    make_coherence_plot(num_topics, avg_coherence)
 
 # topics = range(2, 31, 2) + range(35, 101, 5) + range(110, 201, 10) + range(225, 401, 25)
 # avg_coherence = [-74.949694804000032,
