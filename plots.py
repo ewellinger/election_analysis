@@ -23,9 +23,12 @@ def plot_candidate_percentages(df, candidates):
     plt.show()
 
 
-def article_count_by_time(df, searchterm=None, source=False, freq='W', normalize=False, show=True, marker='o', year=False, fig=None, label=None):
-    if source:
-        outlets = [('nyt', 'New York Times'), ('foxnews', 'Fox News'), ('npr', 'NPR'), ('guardian', 'The Guardian'), ('wsj', 'Wall Street Journal')]
+def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W', normalize=False, show=True, marker='o', year=False, fig=None, label=None):
+    outlets = [('nyt', 'New York Times'), ('foxnews', 'Fox News'), ('npr', 'NPR'), ('guardian', 'The Guardian'), ('wsj', 'Wall Street Journal')]
+    outlet_sizes = [len(df.loc[df['source'] == outlet]) for outlet in zip(*outlets)[0]]
+    if topic:
+        labels, label = topic
+        df = df.loc[labels == label]
     if not searchterm and not source:
         ts = pd.Series([1], index=df['date_published']).resample(freq, how='sum')
         if not fig:
@@ -37,7 +40,7 @@ def article_count_by_time(df, searchterm=None, source=False, freq='W', normalize
     elif not searchterm and source:
         timeseries = [pd.Series([1], index=df.loc[df['source'] == outlet, 'date_published']).resample(freq, how='sum') for outlet in zip(*outlets)[0]]
         if normalize:
-            timeseries = [ts / len(df.loc[df['source'] == outlet]) for ts, outlet in zip(timeseries, zip(*outlets)[0])]
+            timeseries = [ts / outlet_size for ts, outlet_size in zip(timeseries, outlet_sizes)]
         if not fig:
             fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
@@ -62,7 +65,7 @@ def article_count_by_time(df, searchterm=None, source=False, freq='W', normalize
     elif searchterm and source:
         timeseries = [pd.Series(df.loc[df['source'] == outlet, 'lemmatized_text'].str.contains(searchterm).astype('int').values, index=df.loc[df['source'] == outlet, 'date_published']).resample(freq, how='sum') for outlet in zip(*outlets)[0]]
         if normalize:
-            timeseries = [ts / len(df.loc[df['source'] == outlet]) for ts, outlet in zip(timeseries, zip(*outlets)[0])]
+            timeseries = [ts / outlet_size for ts, outlet_size in zip(timeseries, outlet_sizes)]
         if not fig:
             fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
