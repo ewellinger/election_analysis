@@ -23,21 +23,23 @@ def plot_candidate_percentages(df, candidates):
     plt.show()
 
 
-def count_articles_by_time(df, searchterm=None, source=False, freq='W', normalize=False, show=True, marker='o', year=False):
+def article_count_by_time(df, searchterm=None, source=False, freq='W', normalize=False, show=True, marker='o', year=False, fig=None, label=None):
     if source:
         outlets = [('nyt', 'New York Times'), ('foxnews', 'Fox News'), ('npr', 'NPR'), ('guardian', 'The Guardian'), ('wsj', 'Wall Street Journal')]
     if not searchterm and not source:
         ts = pd.Series([1], index=df['date_published']).resample(freq, how='sum')
-        fig = plt.figure(figsize=(12, 8))
+        if not fig:
+            fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
-        ts.plot(marker=marker)
+        ts.plot(marker=marker, label=label)
         plt.xlabel('Date Published')
         plt.ylabel('Article Count (freq={})'.format(freq))
     elif not searchterm and source:
         timeseries = [pd.Series([1], index=df.loc[df['source'] == outlet, 'date_published']).resample(freq, how='sum') for outlet in zip(*outlets)[0]]
         if normalize:
             timeseries = [ts / len(df.loc[df['source'] == outlet]) for ts, outlet in zip(timeseries, zip(*outlets)[0])]
-        fig = plt.figure(figsize=(12, 8))
+        if not fig:
+            fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
         for idx, ts in enumerate(timeseries):
             if len(ts):
@@ -50,7 +52,8 @@ def count_articles_by_time(df, searchterm=None, source=False, freq='W', normaliz
         plt.legend(loc='best')
     elif searchterm and not source:
         ts = pd.Series(df['lemmatized_text'].str.contains(searchterm).astype('int').values, index=df['date_published']).resample(freq, how='sum')
-        fig = plt.figure(figsize=(12, 8))
+        if not fig:
+            fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
         ts.plot(marker=marker)
         plt.xlabel('Date Published', fontsize=12)
@@ -60,7 +63,8 @@ def count_articles_by_time(df, searchterm=None, source=False, freq='W', normaliz
         timeseries = [pd.Series(df.loc[df['source'] == outlet, 'lemmatized_text'].str.contains(searchterm).astype('int').values, index=df.loc[df['source'] == outlet, 'date_published']).resample(freq, how='sum') for outlet in zip(*outlets)[0]]
         if normalize:
             timeseries = [ts / len(df.loc[df['source'] == outlet]) for ts, outlet in zip(timeseries, zip(*outlets)[0])]
-        fig = plt.figure(figsize=(12, 8))
+        if not fig:
+            fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
         for idx, ts in enumerate(timeseries):
             if len(ts):
