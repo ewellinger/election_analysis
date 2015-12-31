@@ -11,6 +11,18 @@ def top_words(clusters, feature_names, num_words):
     return [feature_names[idx] for idx in idxs]
 
 
+def topic_word_freq(topics, idx, feature_names):
+    '''
+    INPUT: topics - Array of word values from nmf_components_
+           idx - Topic label to return frequencies for
+           feature_names - Array of words from tfidf matrix
+    OUTPUT: Array of (word, freq) tuples
+    '''
+    freq_sum = np.sum(topics[idx])
+    frequencies = [val / freq_sum for val in topics[idx]]
+    return [(word, freq) for word, freq in zip(feature_names, frequencies)]
+
+
 def create_document_vector(df, max_features=5000, max_df=1, min_df=1):
     '''
     INPUTS: df - df['lemmatized_text'] will be what is vectorized
@@ -48,11 +60,9 @@ def nmf_articles(df, n_topics, n_features=5000, n_top_words=20, random_state=Non
     W = nmf.transform(X)
 
     labels = np.array([np.argmax(row) for row in W])
-    # rel_importance will give a sense of how well a article can be attributed to a given topic
-    rel_importance = np.array([row[np.argmax(row)] / row.sum() for row in W])
     words = top_words(nmf.components_, feature_names, n_top_words)
 
-    return tfid, nmf, X, W, labels, rel_importance, words, feature_names, reverse_lookup
+    return tfid, nmf, X, W, labels, words, feature_names, reverse_lookup
 
 
 def sum_squared_err(nmf, X, labels):
@@ -62,7 +72,7 @@ def sum_squared_err(nmf, X, labels):
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
-    tfid, nmf, X, W, labels, rel_importance, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=80, n_features=15000, random_state=1, max_df=0.9, min_df=2)
+    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=80, n_features=15000, random_state=1, max_df=0.9, min_df=2)
 
     outlets = [('nyt', 'NYT'), ('foxnews', 'FOX'), ('npr', 'NPR'), ('guardian', 'GUA'), ('wsj', 'WSJ')]
     for idx, words in enumerate(topic_words):
