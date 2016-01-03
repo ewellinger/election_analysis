@@ -30,8 +30,9 @@ def create_document_vector(df, max_features=5000, max_df=1, min_df=1):
             max_df - Cut off for words appearing in a given threshold of documents. (i.e. 1 = no limit, 0.95 will exclude words appearing in at least 95% of documents from being included in the resulting vector)
             min_df - Cut off for words appearing in a minimum number of documents. (i.e. 2 = term must appear in at least two documents)
     OUTPUT: TfidfVectorizer Object
-            TfidfVector
+            TfidfVector (X)
             Feature Names Array
+            Reverse_lookup Dictionary - Used to quickly and efficiently return the index of a given word in the Feature Names Array
     '''
     stopwords = stop_words()
     # Create TfidfVectorizer
@@ -55,13 +56,10 @@ def cluster_articles(df, n_clusters, max_features=5000, max_df=1, min_df=1,  num
 
 def nmf_articles(df, n_topics, n_features=5000, n_top_words=20, random_state=None, max_df=1, min_df=1):
     tfid, X, feature_names, reverse_lookup = create_document_vector(df, max_features=n_features, max_df=max_df, min_df=min_df)
-
     nmf = NMF(n_components=n_topics, random_state=random_state, alpha=.1, l1_ratio=0.5).fit(X)
     W = nmf.transform(X)
-
     labels = np.array([np.argmax(row) for row in W])
     words = top_words(nmf.components_, feature_names, n_top_words)
-
     return tfid, nmf, X, W, labels, words, feature_names, reverse_lookup
 
 
@@ -74,16 +72,16 @@ if __name__=='__main__':
 
     tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=80, n_features=15000, random_state=1, max_df=0.9, min_df=2)
 
-    outlets = [('nyt', 'NYT'), ('foxnews', 'FOX'), ('npr', 'NPR'), ('guardian', 'GUA'), ('wsj', 'WSJ')]
+    outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
     for idx, words in enumerate(topic_words):
         num_articles = len(labels[labels == idx])
-        articles_by_source = [float(len(df.loc[(labels == idx) & (df['source'] == outlet).values, :])) / num_articles for outlet in zip(*outlets)[0]]
+        articles_by_source = [float(len(df.loc[(labels == idx) & (df['source'] == outlet)])) / num_articles for outlet in zip(*outlets)[0]]
         print 'Label {}'.format(idx)
         print words
         print 'Number of articles in topic: {}'.format(num_articles)
-        print '\t'.join(['{0}: {1:.2f}'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], articles_by_source)])
-        normalized = [percent / len(df.loc[df['source'] == outlet, :]) for percent, outlet in zip(articles_by_source, zip(*outlets)[0])]
+        print '\t'.join(['{0}: {1:.2f}%'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], articles_by_source)])
+        normalized = [percent / len(df.loc[df['source'] == outlet]) for percent, outlet in zip(articles_by_source, zip(*outlets)[0])]
         normalized = [percent / np.sum(normalized) for percent in normalized]
         print 'Normalized Percentages'
-        print '\t'.join(['{0}: {1:.2f}'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], normalized)])
+        print '\t'.join(['{0}: {1:.2f}%'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], normalized)])
         print '\n'
