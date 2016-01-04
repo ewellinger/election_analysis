@@ -84,7 +84,7 @@ if __name__=='__main__':
     # Initialize table
     tab = db['articles']
 
-    dates = get_week_tuples(end_mon=11)
+    dates = get_week_tuples(start_mon=12)
     searchterms = get_keywords_2016()
 
     for searchterm in searchterms:

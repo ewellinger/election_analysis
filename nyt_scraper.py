@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from load_data import get_keywords_2016, get_week_tuples
+from load_data import get_keywords_2016, get_week_tuples, parse_str
 from requests import get
 from unidecode import unidecode
 from bs4 import BeautifulSoup
@@ -110,13 +110,6 @@ def already_exists(tab, url):
     return bool(tab.find({'url': url}).count())
 
 
-def parse_str(x):
-    if type(x) == unicode:
-        return unidecode(x)
-    else:
-        return str(x)
-
-
 if __name__ == '__main__':
     # Create MongoClient
     client = MongoClient()
@@ -126,7 +119,7 @@ if __name__ == '__main__':
     tab = db['articles']
 
     keywords = get_keywords_2016()
-    dates = get_week_tuples(end_mon=11)
+    dates = get_week_tuples(start_mon=12)
     # Convert dates from YYYY-MM-DD to YYYYMMDD
     dates = [(date[0].replace('-', ''), date[1].replace('-', ''))
              for date in dates]

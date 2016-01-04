@@ -97,7 +97,7 @@ if __name__=='__main__':
     # Initialize table
     tab = db['articles']
 
-    dates = get_dates(end_mon=12)
+    dates = get_dates(start_mon=12)
     keywords = get_keywords_2016()
 
     num_bad_extractions = concurrent_scrape_npr(tab, keywords, dates)
