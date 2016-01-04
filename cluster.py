@@ -20,7 +20,7 @@ def topic_word_freq(topics, idx, feature_names):
     '''
     freq_sum = np.sum(topics[idx])
     frequencies = [val / freq_sum for val in topics[idx]]
-    return [(word, freq) for word, freq in zip(feature_names, frequencies)]
+    return zip(feature_names, frequencies)
 
 
 def create_document_vector(df, max_features=5000, max_df=1, min_df=1):
