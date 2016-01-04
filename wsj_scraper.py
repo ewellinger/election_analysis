@@ -99,7 +99,7 @@ if __name__=='__main__':
     # Initialize table
     tab = db['articles']
 
-    urls = load_urls('./url_files/wsj_article_urls_2016.txt')
+    urls = load_urls('./url_files/wsj_article_urls_2015_dec.txt')
     good_urls, bad_urls = [], []
 
     driver = log_in_wsj()

@@ -96,7 +96,8 @@ def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W
 
 def topic_time_and_cloud(df, topic, feature_names, nmf, title, mask_path=None, source=False, normalize=False, freq='W', year=True, max_words=300, show=True):
     fig = plt.figure(figsize=(14, 8.5))
-    ax1 = fig.add_subplot(211)
+    ax1 = fig.add_axes([0.05, 0.5, 0.93, 0.41])
+    # ax1 = plt.subplot2grid((2, 5), (0, 0), colspan=5)
     article_count_by_time(df, topic=topic, source=source, normalize=normalize, freq=freq, year=year, fig=fig, show=False)
     plt.suptitle(title, fontsize=20)
 
@@ -106,12 +107,13 @@ def topic_time_and_cloud(df, topic, feature_names, nmf, title, mask_path=None, s
     normalized = [percent / np.sum(df['source'] == outlet) for percent, outlet in zip(percent_by_source, zip(*outlets)[0])]
     normalized = [percent / np.sum(normalized) for percent in normalized]
 
-    byline = 'Number of Articles in Topic: {}\n'.format(num_articles)
-    byline += '\t\t'.join(['{0}: {1:.1f}%'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], normalized)])
+    byline = 'Number of Articles in Topic: {}'.format(num_articles)
+    # byline += '\t\t'.join(['{0}: {1:.1f}%'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], normalized)])
 
     plt.title(byline)
     plt.subplots_adjust(left=0.06, bottom=0.03, right=0.97, top=0.88, hspace=0.28)
-    ax2 = fig.add_subplot(212)
+    ax2 = fig.add_axes([0, 0, 0.75, 0.5])
+    # ax2 = plt.subplot2grid((2, 5), (1, 0), colspan=4)
     word_freq = topic_word_freq(nmf.components_, topic[1], feature_names)
     if mask_path:
         mask = np.array(Image.open(mask_path))
@@ -121,6 +123,10 @@ def topic_time_and_cloud(df, topic, feature_names, nmf, title, mask_path=None, s
     wc.fit_words(word_freq)
     plt.imshow(wc)
     plt.axis('off')
+    ax3 = fig.add_axes([0.75, 0, 0.25, 0.5])
+    # ax3 = plt.subplot2grid((2, 5), (1, 4))
+    normalized_source_barchart(df, topic, outlets, ax3)
+    # plt.tight_layout()
     if show:
         plt.show()
 
@@ -132,12 +138,17 @@ def normalized_source_barchart(df, topic, outlets, ax=None):
     normalized = [percent / np.sum(normalized) for percent in normalized]
 
     if not ax:
-        fig, ax = plt.subplots(1, figsize=(2,5))
+        fig, ax = plt.subplots(1, figsize=(2.5,5))
     for idx, percent in enumerate(normalized):
-        plt.bar(0, percent, width=0.2, label=outlets[idx][1], color=outlets[idx][2], bottom=np.sum(normalized[:idx]))
-    plt.legend(loc='best')
+        plt.bar(0, percent, width=1, label=outlets[idx][1], color=outlets[idx][2], bottom=np.sum(normalized[:idx]))
+        if percent >= 0.1:
+            plt.text(0.5, np.sum(normalized[:idx]) + 0.55*percent, outlets[idx][1] + ': {0:.1f}%'.format(100*percent), horizontalalignment='center', verticalalignment='center')
+        elif percent >= 0.05:
+            plt.text(0.5, np.sum(normalized[:idx]) + 0.55*percent, outlets[idx][1] + ': {0:.1f}%'.format(100*percent), horizontalalignment='center', verticalalignment='center', fontsize=10)
+        elif percent >= 0.025:
+            plt.text(0.5, np.sum(normalized[:idx]) + 0.55*percent, outlets[idx][1] + ': {0:.1f}%'.format(100*percent), horizontalalignment='center', verticalalignment='center', fontsize=8)
     plt.axis('off')
-    plt.show()
+    plt.title('% Reported By Source')
 
 
 

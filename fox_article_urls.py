@@ -29,14 +29,24 @@ def get_urls_from_search(driver, searchterm, date, attempt=0):
             articles = soup.findAll('div', class_='search-article ng-scope')
             for tag in articles:
                 urls.append(str(tag.find('a').get('href')))
-            for page in xrange(2, 2 + num_pages):
-                link = driver.find_element_by_link_text(str(page))
-                link.click()
-                soup = BeautifulSoup(driver.page_source, 'html.parser')
-                articles = soup.findAll(
-                    'div', class_='search-article ng-scope')
-                for tag in articles:
-                    urls.append(str(tag.find('a').get('href')))
+            if num_found % 10 == 0:
+                for page in xrange(2, 1 + num_pages):
+                    link = driver.find_element_by_link_text(str(page))
+                    link.click()
+                    soup = BeautifulSoup(driver.page_source, 'html.parser')
+                    articles = soup.findAll(
+                        'div', class_='search-article ng-scope')
+                    for tag in articles:
+                        urls.append(str(tag.find('a').get('href')))
+            else:
+                for page in xrange(2, 2 + num_pages):
+                    link = driver.find_element_by_link_text(str(page))
+                    link.click()
+                    soup = BeautifulSoup(driver.page_source, 'html.parser')
+                    articles = soup.findAll(
+                        'div', class_='search-article ng-scope')
+                    for tag in articles:
+                        urls.append(str(tag.find('a').get('href')))
             return True, urls
     except:
         if attempt < 3:
@@ -89,7 +99,7 @@ if __name__ == '__main__':
     searchterms = get_keywords_2016()
 
     # Get dates to search over (up to December)
-    dates = get_dates(end_mon=11)
+    dates = get_dates(start_mon=12)
 
     # Initialize empty lists for urls to be appended to
     good_urls, bad_urls = set(), set()
@@ -108,6 +118,6 @@ if __name__ == '__main__':
         searchterms[20:], dates, good_urls, bad_urls)
 
     # Convert good_urls set to a list and write to a txt file
-    with open('./url_files/fox_article_urls_2016.txt', 'w') as f:
+    with open('./url_files/fox_article_urls_2015_dec.txt', 'w') as f:
         f.write(json.dumps(list(good_urls)))
         f.close()

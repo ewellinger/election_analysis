@@ -15,8 +15,15 @@ def add_to_mongo(tab, url):
         return url
 
     soup = BeautifulSoup(html.content, 'html.parser')
-    headline = unidecode(soup.find('h1', attrs={'itemprop': 'headline'}).contents[0])
-    date_published = soup.find('time', attrs={'itemprop': 'datePublished'}).get('datetime')
+
+    try:
+        headline = unidecode(soup.find('h1', attrs={'itemprop': 'headline'}).contents[0])
+    except:
+        return url
+    try:
+        date_published = soup.find('time', attrs={'itemprop': 'datePublished'}).get('datetime')
+    except:
+        return url
     try:
         author = soup.find('a', attrs={'rel': 'author'}).text
     except:
@@ -48,7 +55,7 @@ if __name__=='__main__':
     # Initialize table
     tab = db['articles']
 
-    urls = load_urls('./url_files/fox_article_urls_2016.txt')
+    urls = load_urls('./url_files/fox_article_urls_2015_dec.txt')
 
     bad_urls = []
     for url in urls:

@@ -40,7 +40,7 @@ def get_urls(date, keywords, urls):
 
 if __name__=='__main__':
     keywords = get_keywords_2016()
-    dates = get_dates(end_mon=11)
+    dates = get_dates(start_mon=12)
 
     urls = set()
 
@@ -48,6 +48,6 @@ if __name__=='__main__':
         urls = get_urls(date, keywords, urls)
 
     # Convert urls set to a list and write to a txt file
-    with open('./url_files/wsj_article_urls_2016.txt', 'w') as f:
+    with open('./url_files/wsj_article_urls_2015_dec.txt', 'w') as f:
         f.write(json.dumps(list(urls)))
         f.close()
