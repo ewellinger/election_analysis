@@ -55,7 +55,7 @@ if __name__=='__main__':
     # Initialize table
     tab = db['articles']
 
-    urls = load_urls('./url_files/fox_article_urls_2015_dec.txt')
+    urls = load_urls('./url_files/fox_article_urls_2015.txt')
 
     bad_urls = []
     for url in urls:

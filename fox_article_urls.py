@@ -98,8 +98,8 @@ if __name__ == '__main__':
     # Get all the keywords to search for
     searchterms = get_keywords_2016()
 
-    # Get dates to search over (up to December)
-    dates = get_dates(start_mon=12)
+    # Get dates to search over (all of 2015)
+    dates = get_dates()
 
     # Initialize empty lists for urls to be appended to
     good_urls, bad_urls = set(), set()
@@ -118,6 +118,6 @@ if __name__ == '__main__':
         searchterms[20:], dates, good_urls, bad_urls)
 
     # Convert good_urls set to a list and write to a txt file
-    with open('./url_files/fox_article_urls_2015_dec.txt', 'w') as f:
+    with open('./url_files/fox_article_urls_2015.txt', 'w') as f:
         f.write(json.dumps(list(good_urls)))
         f.close()

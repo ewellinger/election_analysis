@@ -63,6 +63,29 @@ def nmf_articles(df, n_topics, n_features=5000, n_top_words=20, random_state=Non
     return tfid, nmf, X, W, labels, words, feature_names, reverse_lookup
 
 
+def print_topic_summary(df, labels, outlets, topic_words):
+    predominant_source = {'NYT': [], 'FOX': [], 'NPR': [], 'GUA': [], 'WSJ': []}
+    for idx, words in enumerate(topic_words):
+        num_articles = len(labels[labels == idx])
+        print 'Label {}'.format(idx)
+        print words
+        print 'Number of articles in topic: {}'.format(num_articles)
+        if not num_articles:
+            print '\n'
+            continue
+        articles_by_source = [float(len(df.loc[(labels == idx) & (df['source'] == outlet)])) / num_articles for outlet in zip(*outlets)[0]]
+        print '\t'.join(['{0}: {1:.2f}%'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], articles_by_source)])
+        normalized = [percent / len(df.loc[df['source'] == outlet]) for percent, outlet in zip(articles_by_source, zip(*outlets)[0])]
+        normalized = [percent / np.sum(normalized) for percent in normalized]
+        for outlet, percent in zip(zip(*outlets)[1], normalized):
+            if percent >= 0.35:
+                predominant_source[outlet].append((idx, percent))
+        print 'Normalized Percentages'
+        print '\t'.join(['{0}: {1:.2f}%'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], normalized)])
+        print '\n'
+    return predominant_source
+
+
 def sum_squared_err(nmf, X, labels):
     return np.sum([np.linalg.norm(X[idx] - nmf.components_[labels[idx]])**2 for idx in xrange(len(X))])
 
@@ -70,18 +93,8 @@ def sum_squared_err(nmf, X, labels):
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
-    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=80, n_features=15000, random_state=1, max_df=0.9, min_df=2)
+    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=80, n_features=10000, random_state=1, max_df=0.8, min_df=5)
 
     outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
-    for idx, words in enumerate(topic_words):
-        num_articles = len(labels[labels == idx])
-        articles_by_source = [float(len(df.loc[(labels == idx) & (df['source'] == outlet)])) / num_articles for outlet in zip(*outlets)[0]]
-        print 'Label {}'.format(idx)
-        print words
-        print 'Number of articles in topic: {}'.format(num_articles)
-        print '\t'.join(['{0}: {1:.2f}%'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], articles_by_source)])
-        normalized = [percent / len(df.loc[df['source'] == outlet]) for percent, outlet in zip(articles_by_source, zip(*outlets)[0])]
-        normalized = [percent / np.sum(normalized) for percent in normalized]
-        print 'Normalized Percentages'
-        print '\t'.join(['{0}: {1:.2f}%'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], normalized)])
-        print '\n'
+
+    predominant_source = print_topic_summary(df, labels, outlets, topic_words)

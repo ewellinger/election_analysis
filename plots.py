@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from PIL import Image
 from wordcloud import WordCloud
-from cluster import topic_word_freq, nmf_articles
+from cluster import topic_word_freq, nmf_articles, print_topic_summary
 
 
 def plot_candidate_percentages(df, candidates):
@@ -97,8 +97,8 @@ def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W
 def topic_time_and_cloud(df, topic, feature_names, nmf, title, mask_path=None, source=False, normalize=False, freq='W', year=True, max_words=300, show=True):
     fig = plt.figure(figsize=(14, 8.5))
     ax1 = fig.add_axes([0.05, 0.5, 0.93, 0.41])
-    # ax1 = plt.subplot2grid((2, 5), (0, 0), colspan=5)
     article_count_by_time(df, topic=topic, source=source, normalize=normalize, freq=freq, year=year, fig=fig, show=False)
+    ax1.xaxis.labelpad = -4
     plt.suptitle(title, fontsize=20)
 
     outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
@@ -107,26 +107,20 @@ def topic_time_and_cloud(df, topic, feature_names, nmf, title, mask_path=None, s
     normalized = [percent / np.sum(df['source'] == outlet) for percent, outlet in zip(percent_by_source, zip(*outlets)[0])]
     normalized = [percent / np.sum(normalized) for percent in normalized]
 
-    byline = 'Number of Articles in Topic: {}'.format(num_articles)
-    # byline += '\t\t'.join(['{0}: {1:.1f}%'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], normalized)])
-
-    plt.title(byline)
+    plt.title('Number of Articles in Topic: {}'.format(num_articles), x=0.4825)
     plt.subplots_adjust(left=0.06, bottom=0.03, right=0.97, top=0.88, hspace=0.28)
-    ax2 = fig.add_axes([0, 0, 0.75, 0.5])
-    # ax2 = plt.subplot2grid((2, 5), (1, 0), colspan=4)
+    ax2 = fig.add_axes([0.025, 0, 0.79, 0.425])
     word_freq = topic_word_freq(nmf.components_, topic[1], feature_names)
     if mask_path:
         mask = np.array(Image.open(mask_path))
-        wc = WordCloud(background_color='white', max_words=max_words, width=1900, height=500, mask=mask)
+        wc = WordCloud(background_color='white', max_words=max_words, width=1900, height=600, mask=mask)
     else:
-        wc = WordCloud(background_color='white', max_words=max_words, width=1900, height=500)
+        wc = WordCloud(background_color='white', max_words=max_words, width=1900, height=600)
     wc.fit_words(word_freq)
     plt.imshow(wc)
     plt.axis('off')
-    ax3 = fig.add_axes([0.75, 0, 0.25, 0.5])
-    # ax3 = plt.subplot2grid((2, 5), (1, 4))
+    ax3 = fig.add_axes([0.825, 0.01, 0.15555, 0.4])
     normalized_source_barchart(df, topic, outlets, ax3)
-    # plt.tight_layout()
     if show:
         plt.show()
 
@@ -158,18 +152,12 @@ if __name__=='__main__':
     # Plot % of articles mentioning candidate accross all news sources
     # plot_candidate_percentages(df, ['Clinton', 'Trump', 'Bush'])
 
-    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=80, n_features=15000, random_state=1, max_df=0.9, min_df=2)
+    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=100, n_features=10000, random_state=1, max_df=0.8, min_df=5)
 
     outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
-    for idx, words in enumerate(topic_words):
-        num_articles = len(labels[labels == idx])
-        articles_by_source = [float(len(df.loc[(labels == idx) & (df['source'] == outlet)])) / num_articles for outlet in zip(*outlets)[0]]
-        print 'Label {}'.format(idx)
-        print words
-        print 'Number of articles in topic: {}'.format(num_articles)
-        print '\t'.join(['{0}: {1:.2f}%'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], articles_by_source)])
-        normalized = [percent / len(df.loc[df['source'] == outlet]) for percent, outlet in zip(articles_by_source, zip(*outlets)[0])]
-        normalized = [percent / np.sum(normalized) for percent in normalized]
-        print 'Normalized Percentages'
-        print '\t'.join(['{0}: {1:.2f}%'.format(outlet, percent*100) for outlet, percent in zip(zip(*outlets)[1], normalized)])
-        print '\n'
+
+    predominant_source = print_topic_summary(df, labels, outlets, topic_words)
+
+    # for idx in xrange(100):
+    #     print topic_words[idx]
+    #     topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}'.format(str(idx)))

@@ -9,7 +9,7 @@ import seaborn as sns
 
 def nmf_similarity(df, num_topics):
     print 'Processing {} Topics...'.format(num_topics)
-    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=num_topics, n_features=15000, random_state=1, max_df=0.95, min_df=2)
+    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=num_topics, n_features=10000, random_state=1, max_df=0.8, min_df=5)
     print 'Clustering Done...'
     pbar = ProgressBar()
     tfidf_similarity = []
@@ -39,13 +39,13 @@ def make_similarity_plot(n_topics, tfidf_similarity, topic_similarity):
     plt.title('Articles Within Topics', fontsize=11)
     plt.suptitle('Cosine Similarity of NMF Model', fontsize=18, x=0.52)
     plt.subplots_adjust(left=0.09, right=0.95, top=0.87, hspace=0.16)
-    plt.savefig('plots/nmf_similarity.png', dpi=350)
+    plt.savefig('plots/nmf_similarity_2.png', dpi=350)
 
 
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
-    n_topics = range(165, 251, 5)
+    n_topics = range(2, 41) + range(42, 101, 2) + range(105, 176, 5)
     similarity = [nmf_similarity(df, n_topic) for n_topic in n_topics]
     tfidf_similarity = np.array(zip(*similarity)[0])
     topic_similarity = np.array(zip(*similarity)[1])
