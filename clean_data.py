@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import re, string
 from pymongo import MongoClient
-from load_data import get_canidate_names_2016, parse_str, stop_words
+from load_data import get_canidate_names_2016, parse_str, stop_words, fix_lemmatized_words
 import pattern.en as en
 
 
@@ -61,8 +61,12 @@ def remove_email_nums(doc):
 def lemmatize_article(article):
     # Load in stopwords from load_data
     stopwords = stop_words()
+    # Load Dictionary to fix commonly mislemmatized words
+    correct_lemma = fix_lemmatized_words()
     # Lemmatize article by running each word through the pattern.en lemmatizer and only including it in the resulting text if the word doesn't appear in the set of stopwords
-    return ' '.join([en.lemma(w) for w in article.split() if w not in stopwords])
+    article = ' '.join([en.lemma(w) for w in article.split() if w not in stopwords])
+    # Return the article text after fixing common mislemmatized words
+    return ' '.join([correct_lemma[w] if w in correct_lemma else w for w in article.split()])
 
 
 if __name__=='__main__':
