@@ -3,22 +3,28 @@
 <h4>Data Science Capstone Project</h4></center>
 
 ---
-The purpose of this project is to scrape a variety of news sites for articles covering the 2016 U.S. Election cycle throughout 2015 as part of the Galvanize Data Science Immersive Capstone Project.  Natural Language Processing analysis will then be done on the text of the articles to see what sort of trends can be found in the coverage throughout the year.
+The purpose of this project is to scrape a variety of news sites for articles covering the 2016 U.S. Election cycle throughout 2015 as part of the Galvanize Data Science Immersive Capstone Project.  Natural Language Processing analysis will then be done on the text of the articles to see what latent topics are present in the media coverage across a variety of news outlets.
 
-Time permitting, similar analysis will be done on previous general election cycles (e.g. 2007 for the election cycle of Obama's first election).
+Time permitting, similar analysis will be done on previous general election cycles (e.g. 2007 for the election cycle of Obama's first election).  Future plans for this project include deploying a front facing website for exploring the resulting topics and how the coverage of media outlets differ within topics, as well as how their coverage varies over the course of the year.
+
+---
+
+### Web-Scraping Methodology
+
 
 News Outlets Scraped Include:
-* Fox News (Done)
-* The New York Times (Done)
-* The Wall Street Journal (Done)
-* The Guardian (Done)
-* NPR (Done)
+* Fox News
+* The New York Times
+* The Wall Street Journal
+* The Guardian
+* NPR
 
 Other possible sources:
+* USA Today (Waiting for API Access)
 * The Washington Post
 * MSNBC
-* CNN
 * NBC News
+* ~~CNN~~ (No way to scrape)
 * ~~BBC~~ (No good way to scrape, API is only open to BBC Employees)
 * ~~Al Jazeera~~ (No way to scrape)
 
