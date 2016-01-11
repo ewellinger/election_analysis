@@ -69,6 +69,23 @@ def lemmatize_article(article):
     return ' '.join([correct_lemma[w] if w in correct_lemma else w for w in article.split()])
 
 
+def sentiment(article):
+    en.wordnet.sentiment.load()
+    relevant_types = ['JJ', 'VB', 'RB']
+    score, objectivity = [], []
+    sentences = en.split(en.parse(article, lemmata=True))
+    for sentence in sentences:
+        for word in sentence.words:
+            if word.type in relevant_types:
+                pos, neg, obj = en.wordnet.sentiment[word.lemma]
+                print word, pos, neg, obj
+                score.append(pos - neg)
+                objectivity.append(obj)
+    return np.mean(score), np.mean(objectivity)
+
+
+
+
 if __name__=='__main__':
     # Create MongoClient
     client = MongoClient()
