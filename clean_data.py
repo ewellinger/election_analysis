@@ -32,7 +32,7 @@ def read_mongo(tab, query={}, no_id=True):
     return df
 
 
-def clean_df(df, columns, keywords, lemmatize_text=True):
+def clean_df(df, columns, keywords, lemmatize_text=True, polarity_threshold=0.1):
     # Remove emails, lower text, and convert to str
     df['article_text'] = df['article_text'].apply(remove_email_nums).apply(parse_str).apply(lambda x: x.lower().strip('advertisement').translate(None, string.punctuation))
 
@@ -43,6 +43,15 @@ def clean_df(df, columns, keywords, lemmatize_text=True):
     if lemmatize_text:
         df['lemmatized_text'] = df['article_text'].apply(lemmatize_article)
         columns.append('lemmatized_text')
+
+        # Use pattern.en.sentiment method for creating columns for polarity, sentiment, and positivity (using 0.1 polarity threshold)
+        sentiment = df['lemmatized_text'].apply(en.sentiment)
+        df['polarity'] = zip(*sentiment)[0]
+        df['subjectivity'] = zip(*sentiment)[1]
+        df['positive'] = df['polarity'] >= polarity_threshold
+        columns.append('polarity')
+        columns.append('subjectivity')
+        columns.append('positive')
 
     # Sort by the date_published and reset the index
     df = df.sort_values(by='date_published').reset_index(drop=True)
