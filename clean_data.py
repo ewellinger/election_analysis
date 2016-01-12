@@ -39,12 +39,12 @@ def clean_df(df, columns, keywords, lemmatize_text=True, polarity_threshold=0.1)
     # Filter out any record in dataframe where the article_text doesn't contain any of the keywords
     df = df.loc[df['article_text'].str.contains(keywords), :]
 
-    # Lemmatize article text if lemmatize_text is set to True
+    # Lemmatize article text and calculate sentiment if lemmatize_text is set to True
     if lemmatize_text:
         df['lemmatized_text'] = df['article_text'].apply(lemmatize_article)
         columns.append('lemmatized_text')
 
-        # Use pattern.en.sentiment method for creating columns for polarity, sentiment, and positivity (using 0.1 polarity threshold)
+        # Use pattern.en.sentiment method for creating columns for polarity, sentiment, and positivity (using polarity_threshold as cutoff between negative/positive)
         sentiment = df['lemmatized_text'].apply(en.sentiment)
         df['polarity'] = zip(*sentiment)[0]
         df['subjectivity'] = zip(*sentiment)[1]
@@ -68,6 +68,10 @@ def remove_email_nums(doc):
 
 
 def lemmatize_article(article):
+    '''
+    INPUT: article (str) - raw text from the article (where text has been lowered and punctuation removed already)
+    OUTPUT: lemmatized_article - article text with all stopwords removed and the remaining text lemmatized
+    '''
     # Load in stopwords from load_data
     stopwords = stop_words()
     # Load Dictionary to fix commonly mislemmatized words
@@ -76,23 +80,6 @@ def lemmatize_article(article):
     article = ' '.join([en.lemma(w) for w in article.split() if w not in stopwords])
     # Return the article text after fixing common mislemmatized words
     return ' '.join([correct_lemma[w] if w in correct_lemma else w for w in article.split()])
-
-
-def sentiment(article):
-    en.wordnet.sentiment.load()
-    relevant_types = ['JJ', 'VB', 'RB']
-    score, objectivity = [], []
-    sentences = en.split(en.parse(article, lemmata=True))
-    for sentence in sentences:
-        for word in sentence.words:
-            if word.type in relevant_types:
-                pos, neg, obj = en.wordnet.sentiment[word.lemma]
-                print word, pos, neg, obj
-                score.append(pos - neg)
-                objectivity.append(obj)
-    return np.mean(score), np.mean(objectivity)
-
-
 
 
 if __name__=='__main__':
@@ -108,8 +95,11 @@ if __name__=='__main__':
     # Columns to keep in the resulting dataframe
     columns = ['date_published', 'source', 'url', 'author', 'content_type', 'headline', 'article_text']
 
+    # Read in the data from the Mongo database and return a pandas dataframe of the resulting information
     df = read_mongo(tab)
 
+    # Process the dataframe
     df = clean_df(df, columns, keywords)
 
+    # Save the pickled dataframe for easy access later
     df.to_pickle('./election_data.pkl')
