@@ -36,7 +36,7 @@ def create_document_vector(df, max_features=5000, max_df=1, min_df=1):
     '''
     stopwords = stop_words()
     # Create TfidfVectorizer
-    tfid = TfidfVectorizer(input='content', stop_words=stopwords, use_idf=True, lowercase=True, max_features=max_features)
+    tfid = TfidfVectorizer(input='content', stop_words=stopwords, use_idf=True, lowercase=True, max_features=max_features, max_df=max_df, min_df=min_df)
     X = tfid.fit_transform(df['lemmatized_text'].values)
     feature_names = np.array(tfid.get_feature_names())
     reverse_lookup = {word: idx for idx, word in enumerate(feature_names)}
