@@ -94,7 +94,7 @@ def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W
         plt.show()
 
 
-def topic_time_and_cloud(df, topic, feature_names, nmf, title, mask_path=None, source=False, normalize=False, freq='W', year=True, max_words=300, show=True):
+def topic_time_and_cloud(df, topic, feature_names, nmf, title, source=False, normalize=False, freq='W', year=True, max_words=300, positivity=True, show=True):
     fig = plt.figure(figsize=(14, 8.5))
     ax1 = fig.add_axes([0.05, 0.5, 0.93, 0.41])
     article_count_by_time(df, topic=topic, source=source, normalize=normalize, freq=freq, year=year, fig=fig, show=False)
@@ -108,19 +108,28 @@ def topic_time_and_cloud(df, topic, feature_names, nmf, title, mask_path=None, s
     normalized = [percent / np.sum(normalized) for percent in normalized]
 
     plt.title('Number of Articles in Topic: {}'.format(num_articles), x=0.4825)
-    plt.subplots_adjust(left=0.06, bottom=0.03, right=0.97, top=0.88, hspace=0.28)
-    ax2 = fig.add_axes([0.025, 0, 0.79, 0.425])
-    word_freq = topic_word_freq(nmf.components_, topic[1], feature_names)
-    if mask_path:
-        mask = np.array(Image.open(mask_path))
-        wc = WordCloud(background_color='white', max_words=max_words, width=1900, height=600, mask=mask)
+
+    if not positivity:
+        ax2 = fig.add_axes([0.025, 0, 0.79, 0.43])
+        wc = WordCloud(background_color='white', max_words=max_words, width=1900, height=625)
     else:
-        wc = WordCloud(background_color='white', max_words=max_words, width=1900, height=600)
+        num_sources = 0
+        for idx in xrange(len(outlets)):
+            if len(df.loc[(topic[0] == topic[1]) & (df['source'] == outlets[idx][0])]) >= 5:
+                num_sources += 1
+        ax2 = fig.add_axes([0.025, 0, 0.712125-(num_sources*0.034425), 0.43])
+        wc = WordCloud(background_color='white', max_words=max_words, width=1715-(num_sources*83), height=625)
+        ax4 = fig.add_axes([0.782125-(num_sources*0.034425), 0.035, 0.034425+(num_sources*0.034425), 0.375])
+    word_freq = topic_word_freq(nmf.components_, topic[1], feature_names)
     wc.fit_words(word_freq)
-    plt.imshow(wc)
-    plt.axis('off')
+    ax2.imshow(wc)
+    ax2.axis('off')
     ax3 = fig.add_axes([0.825, 0.01, 0.15555, 0.4])
     normalized_source_barchart(df, topic, outlets, ax3)
+    if positivity:
+        sentiment_source_barchart(df.loc[topic[0] == topic[1]], outlets, ax=ax4)
+        if num_sources < 3:
+            ax4.set_title('')
     if show:
         plt.show()
 
@@ -136,14 +145,48 @@ def normalized_source_barchart(df, topic, outlets, ax=None):
     for idx, percent in enumerate(normalized):
         plt.bar(0, percent, width=1, label=outlets[idx][1], color=outlets[idx][2], bottom=np.sum(normalized[:idx]))
         if percent >= 0.1:
-            plt.text(0.5, np.sum(normalized[:idx]) + 0.55*percent, outlets[idx][1] + ': {0:.1f}%'.format(100*percent), horizontalalignment='center', verticalalignment='center')
+            plt.text(0.5, np.sum(normalized[:idx]) + 0.5*percent, outlets[idx][1] + ': {0:.1f}%'.format(100*percent), horizontalalignment='center', verticalalignment='center')
         elif percent >= 0.05:
-            plt.text(0.5, np.sum(normalized[:idx]) + 0.55*percent, outlets[idx][1] + ': {0:.1f}%'.format(100*percent), horizontalalignment='center', verticalalignment='center', fontsize=10)
+            plt.text(0.5, np.sum(normalized[:idx]) + 0.5*percent, outlets[idx][1] + ': {0:.1f}%'.format(100*percent), horizontalalignment='center', verticalalignment='center', fontsize=10)
         elif percent >= 0.025:
-            plt.text(0.5, np.sum(normalized[:idx]) + 0.55*percent, outlets[idx][1] + ': {0:.1f}%'.format(100*percent), horizontalalignment='center', verticalalignment='center', fontsize=8)
+            plt.text(0.5, np.sum(normalized[:idx]) + 0.5*percent, outlets[idx][1] + ': {0:.1f}%'.format(100*percent), horizontalalignment='center', verticalalignment='center', fontsize=8)
     plt.axis('off')
-    plt.title('% Reported By Source')
+    plt.title('% Reported By Source (Normalized)', fontsize=10)
 
+
+def sentiment_source_barchart(df, outlets, ax=None):
+    '''
+    INPUT: df - Dataframe containing positivity data for each article.  Can be the entire dataframe or a slice of the dataframe
+           outlets - List containing the labels for each outlet and the proper color code for each bar
+           ax - Pyplot Axis object.  If None, a figure and axis object will be created, otherwise the barchart will be added to whatever axis object was passed.
+    '''
+    if not ax:
+        fig, ax = plt.subplots(1, figsize=(6, 6))
+
+    # Only include a source if they have at least 5 articles in the df
+    idxs = []
+    for idx in xrange(len(outlets)):
+        if len(df.loc[df['source'] == outlets[idx][0]]) >= 5:
+            idxs.append(idx)
+    mod_outlets = np.array(outlets)[idxs]
+
+    positivity = [np.mean(df.loc[df['source'] == outlet, 'positive']) for outlet in zip(*mod_outlets)[0]]
+    ind = np.arange(len(mod_outlets))  # x locations for each bar
+    width = 1.0  # Width of the bars
+    colors = zip(*mod_outlets)[2]
+
+    # Create each bar
+    rects = ax.bar(ind, positivity, width, color=colors)
+
+    # Set y axis limits
+    ax.set_ylim((0.0, 0.9))
+    # Add text for labels
+    ax.set_xticks(ind + (width/2))
+    ax.set_xticklabels(zip(*mod_outlets)[1])
+    ax.set_title('Positivity By News Outlet', fontsize=10)
+    ax.set_ylabel('% Articles Classified As Positive')
+    # Move labels closer to the axis
+    ax.xaxis.set_tick_params(pad=4)
 
 
 if __name__=='__main__':
@@ -152,12 +195,18 @@ if __name__=='__main__':
     # Plot % of articles mentioning candidate accross all news sources
     # plot_candidate_percentages(df, ['Clinton', 'Trump', 'Bush'])
 
-    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=100, n_features=10000, random_state=1, max_df=0.8, min_df=5)
+    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=130, n_features=10000, random_state=1, max_df=0.8, min_df=5)
 
     outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
 
     predominant_source = print_topic_summary(df, labels, outlets, topic_words)
 
-    # for idx in xrange(100):
-    #     print topic_words[idx]
-    #     topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}'.format(str(idx)))
+    path = './topic_plots/'
+    for idx in xrange(130):
+        print 'Topic {}'.format(str(idx))
+        print topic_words[idx]
+        print '\n'
+        topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}'.format(str(idx)), show=False)
+        file_name = path + 'topic_{}.png'.format(idx)
+        plt.savefig(file_name, dpi=300)
+        plt.close()

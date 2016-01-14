@@ -7,6 +7,14 @@ The purpose of this project is to scrape a variety of news sites for articles co
 
 Time permitting, similar analysis will be done on previous general election cycles (e.g. 2007 for the election cycle of Obama's first election).  Future plans for this project include deploying a front facing website for exploring the resulting topics and how the coverage of media outlets differ within topics, as well as how their coverage varies over the course of the year.
 
+Below is an example of one of the latent topics extracted with the [NMF][wiki-nmf] Algorithm.  This graph shows the number of articles attributed to this topic over the course of 2015, a breakdown of the normalized percentage of coverage by each news outlet, and a word cloud showing the most prominent words associated with this topic.  Following the explanation of the methodology behind the data collection, processing, and analysis, other topics will be explored.
+
+[wiki-nmf]: https://en.wikipedia.org/wiki/Non-negative_matrix_factorization
+
+![gun_control](./plots/Gun_Control.png "Sample Time Series Graph With WordCloud")
+
+
+
 ---
 
 ### Web-Scraping Methodology
@@ -89,7 +97,9 @@ Cleaning Steps Included:
 * Parse unicode characters from article text
 * Filter out any articles whose article text doesn't contain at least one candidate name
 * Text Processing / Lemmatization (See Below)
-* Add sentiment data to dataframe using `pattern.en.sentiment` function
+* Add sentiment data to dataframe using `pattern.en` [sentiment][pattern-sentiment] function
+
+[pattern-sentiment]: http://www.clips.ua.ac.be/pages/pattern-en#sentiment
 
 ---
 
