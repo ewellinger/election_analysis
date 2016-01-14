@@ -89,7 +89,7 @@ def parse_str(x):
 
 
 def stop_words():
-    return stopwords.words('english') + ['guardian', 'new york times', 'nyt', 'wall street journal', 'wsj', 'mr', 'mrs', 'ms', 'gov', 'sen', 'rep', 'said', 'fox', 'would', 'campaign', 'candidate', 'washingtonexaminercom', 'npr']
+    return stopwords.words('english') + ['guardian', 'new york times', 'nyt', 'wall street journal', 'wsj', 'mr', 'mrs', 'ms', 'gov', 'sen', 'rep', 'said', 'fox', 'would', 'campaign', 'candidate', 'washingtonexaminercom', 'npr', 'httpwwwwashingtonexaminercomarticle']
 
 
 def fix_lemmatized_words():
@@ -227,7 +227,37 @@ def topic_labels():
     96: 'Theater (junk)',
     97: 'Pope Francis',
     98: 'SuperPAC / Political Donations',
-    99: 'Benghazi Committee'
+    99: 'Benghazi Committee',
+    100: '',
+    101: '',
+    102: '',
+    103: '',
+    104: '',
+    105: '',
+    106: '',
+    107: '',
+    108: '',
+    109: '',
+    110: '',
+    111: '',
+    112: '',
+    113: '',
+    114: '',
+    115: '',
+    116: '',
+    117: '',
+    118: '',
+    119: '',
+    120: '',
+    121: '',
+    122: '',
+    123: '',
+    124: '',
+    125: '',
+    126: '',
+    127: '',
+    128: '',
+    129: ''
     }
     return topic_label
 

@@ -45,7 +45,7 @@ def clean_df(df, columns, keywords, lemmatize_text=True, polarity_threshold=0.1)
         columns.append('lemmatized_text')
 
         # Use pattern.en.sentiment method for creating columns for polarity, sentiment, and positivity (using polarity_threshold as cutoff between negative/positive)
-        sentiment = df['lemmatized_text'].apply(en.sentiment)
+        sentiment = df['article_text'].apply(en.sentiment)
         df['polarity'] = zip(*sentiment)[0]
         df['subjectivity'] = zip(*sentiment)[1]
         df['positive'] = df['polarity'] >= polarity_threshold
