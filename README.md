@@ -53,37 +53,37 @@ Other Possible News Outlets To Include:
 #### Republican
 
 Candidate      | Announcement Date | Suspension Date
----------------|-------------------|----------------
-Ted Cruz       | 03/23/2015        | N/A
-Rand Paul      | 04/07/2015        | N/A
-Marco Rubio    | 04/13/2015        | N/A
-Ben Carson     | 05/04/2015        | N/A
-Carly Fiorina  | 05/04/2015        | N/A
-Mike Huckabee  | 05/05/2015        | N/A
-Rick Santorum  | 05/27/2015        | N/A
-George Pataki  | 05/28/2015        | 12/29/2015
-Lindsey Graham | 06/01/2015        | 12/21/2015
-Rick Perry     | 06/04/2015        | 09/11/2015
-Jeb Bush       | 06/15/2015        | N/A
-Donald Trump   | 06/16/2015        | N/A
-Bobby Jindal   | 06/24/2015        | 11/17/2015
-Chris Christie | 06/30/2015        | N/A
-Scott Walker   | 07/13/2015        | 09/21/2015
-John Kasich    | 07/21/2015        | N/A
-Jim Gilmore    | 07/30/2015        | N/A
+---------------|:-----------------:|:--------------:
+Ted Cruz       |    03/23/2015     |       N/A
+Rand Paul      |    04/07/2015     |       N/A
+Marco Rubio    |    04/13/2015     |       N/A
+Ben Carson     |    05/04/2015     |       N/A
+Carly Fiorina  |    05/04/2015     |       N/A
+Mike Huckabee  |    05/05/2015     |       N/A
+Rick Santorum  |    05/27/2015     |       N/A
+George Pataki  |    05/28/2015     |   12/29/2015
+Lindsey Graham |    06/01/2015     |   12/21/2015
+Rick Perry     |    06/04/2015     |   09/11/2015
+Jeb Bush       |    06/15/2015     |       N/A
+Donald Trump   |    06/16/2015     |       N/A
+Bobby Jindal   |    06/24/2015     |   11/17/2015
+Chris Christie |    06/30/2015     |       N/A
+Scott Walker   |    07/13/2015     |   09/21/2015
+John Kasich    |    07/21/2015     |       N/A
+Jim Gilmore    |    07/30/2015     |       N/A
 
 
 #### Democrat
 
 Candidate       | Announcement Date | Suspension Date
-----------------|-------------------|----------------
-Hillary Clinton | 04/12/2015        | N/A
-Bernie Sanders  | 04/30/2015        | N/A
-Martin O'Malley | 05/30/2015        | N/A
-Lincoln Chafee  | 06/03/2015        | 10/23/2015
-Jim Webb        | 07/02/2015        | 10/20/2015
-Lawrence Lessig | 09/06/2015        | 11/02/2015
-Joe Biden       | N/A               | 10/21/2015
+----------------|:-----------------:|:--------------:
+Hillary Clinton |    04/12/2015     |       N/A
+Bernie Sanders  |    04/30/2015     |       N/A
+Martin O'Malley |    05/30/2015     |       N/A
+Lincoln Chafee  |    06/03/2015     |   10/23/2015
+Jim Webb        |    07/02/2015     |   10/20/2015
+Lawrence Lessig |    09/06/2015     |   11/02/2015
+Joe Biden       |        N/A        |   10/21/2015
 
 ---
 

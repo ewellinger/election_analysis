@@ -53,10 +53,10 @@ def make_similarity_plot(n_topics, tfidf_similarity, topic_similarity, x=None):
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
-    n_topics = range(2, 41) + range(42, 101, 2) + range(105, 176, 5)
+    n_topics = range(2, 61) + range(62, 181, 2)
     similarity = [nmf_similarity(df, n_topic) for n_topic in n_topics]
     tfidf_similarity = np.array(zip(*similarity)[0])
     topic_similarity = np.array(zip(*similarity)[1])
     reconst_err = np.array(zip(*similarity)[2])
 
-    make_similarity_plot(n_topics, tfidf_similarity, topic_similarity, x=130)
+    make_similarity_plot(n_topics, tfidf_similarity, topic_similarity, x=90)

@@ -195,14 +195,14 @@ if __name__=='__main__':
     # Plot % of articles mentioning candidate accross all news sources
     # plot_candidate_percentages(df, ['Clinton', 'Trump', 'Bush'])
 
-    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=130, n_features=10000, random_state=1, max_df=0.8, min_df=5)
+    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=90, n_features=10000, random_state=1, max_df=0.8, min_df=5)
 
     outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
 
     predominant_source = print_topic_summary(df, labels, outlets, topic_words)
 
     path = './topic_plots/'
-    for idx in xrange(130):
+    for idx in xrange(90):
         print 'Topic {}'.format(str(idx))
         print topic_words[idx]
         print '\n'
