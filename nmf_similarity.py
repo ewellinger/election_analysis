@@ -9,15 +9,15 @@ import seaborn as sns
 
 def nmf_similarity(df, num_topics):
     print 'Processing {} Topics...'.format(num_topics)
-    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=num_topics, n_features=10000, random_state=1, max_df=0.8, min_df=5)
+    nmf, X, W, W_percent, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=num_topics, n_features=10000, random_state=1, max_df=0.8, min_df=5)
     print 'Clustering Done...'
     pbar = ProgressBar()
     tfidf_similarity = []
     num_zero = 0
     for topic in pbar(xrange(num_topics)):
         # When looking at high numbers of topics, it is possible for no points to be assigned to that topic, in which case pairwise_distances() will throw an error.  The label should also be skipped if only one article is assigned as pairwise_distances will return nan
-        if len(labels[labels == topic]) > 1:
-            cosine_dist = pairwise_distances(X[labels == topic], metric='cosine', n_jobs=-1)
+        if labels[:, topic].sum() > 1:
+            cosine_dist = pairwise_distances(X[labels[:, topic]], metric='cosine', n_jobs=-1)
             idx = np.tril_indices(cosine_dist.shape[0], k=-1)
             tfidf_similarity.append(1 - cosine_dist[idx].mean())
         else:

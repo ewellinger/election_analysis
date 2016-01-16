@@ -9,7 +9,7 @@ import seaborn as sns
 
 def get_avg_coherence(df, n_topics):
     print '{} Topics Processing...'.format(n_topics)
-    tfid, nmf, X, W, labels, rel_importance, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=n_topics, n_features=15000, random_state=1, max_df=0.95, min_df=2)
+    nmf, X, W, W_percent, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=n_topics, n_features=10000, random_state=1, max_df=0.8, min_df=5)
     print 'Factorizing Done...'
     pbar = ProgressBar()
     coherence = []

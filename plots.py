@@ -32,8 +32,8 @@ def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W
     frequency = {'D': 'Daily', 'W': 'Weekly', 'M': 'Monthly'}
     outlet_sizes = [len(df.loc[df['source'] == outlet]) for outlet in zip(*outlets)[0]]
     if topic:
-        labels, label = topic
-        df = df.loc[labels == label]
+        labels, label_num = topic
+        df = df.loc[labels[:, label_num]]
     if not searchterm and not source:
         ts = pd.Series([1], index=df['date_published']).resample(freq, how='sum').fillna(0)
         if not fig:
@@ -102,8 +102,11 @@ def topic_time_and_cloud(df, topic, feature_names, nmf, title, source=False, nor
     plt.suptitle(title, fontsize=20)
 
     outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
-    num_articles = np.sum(topic[0] == topic[1])
-    percent_by_source = [float(len(df.loc[(topic[0] == topic[1]) & (df['source'] == outlet)])) / num_articles for outlet in zip(*outlets)[0]]
+
+    # Create a boolean mask for whether each document is in the topic or not
+    labels_mask = topic[0][:, topic[1]]
+    num_articles = labels_mask.sum()
+    percent_by_source = [float(len(df.loc[(labels_mask) & (df['source'] == outlet)])) / num_articles for outlet in zip(*outlets)[0]]
     normalized = [percent / np.sum(df['source'] == outlet) for percent, outlet in zip(percent_by_source, zip(*outlets)[0])]
     normalized = [percent / np.sum(normalized) for percent in normalized]
 
@@ -115,7 +118,7 @@ def topic_time_and_cloud(df, topic, feature_names, nmf, title, source=False, nor
     else:
         num_sources = 0
         for idx in xrange(len(outlets)):
-            if len(df.loc[(topic[0] == topic[1]) & (df['source'] == outlets[idx][0])]) >= 5:
+            if len(df.loc[(labels_mask) & (df['source'] == outlets[idx][0])]) >= 5:
                 num_sources += 1
         ax2 = fig.add_axes([0.025, 0, 0.712125-(num_sources*0.034425), 0.43])
         wc = WordCloud(background_color='white', max_words=max_words, width=1715-(num_sources*83), height=625)
@@ -127,7 +130,7 @@ def topic_time_and_cloud(df, topic, feature_names, nmf, title, source=False, nor
     ax3 = fig.add_axes([0.825, 0.01, 0.15555, 0.4])
     normalized_source_barchart(df, topic, outlets, ax3)
     if positivity:
-        sentiment_source_barchart(df.loc[topic[0] == topic[1]], outlets, ax=ax4)
+        sentiment_source_barchart(df.loc[labels_mask], outlets, ax=ax4)
         if num_sources < 3:
             ax4.set_title('')
     if show:
@@ -135,8 +138,9 @@ def topic_time_and_cloud(df, topic, feature_names, nmf, title, source=False, nor
 
 
 def normalized_source_barchart(df, topic, outlets, ax=None):
-    num_articles = np.sum(topic[0] == topic[1])
-    percent_by_source = [float(len(df.loc[(topic[0] == topic[1]) & (df['source'] == outlet)])) / num_articles for outlet in zip(*outlets)[0]]
+    labels_mask = topic[0][:, topic[1]]
+    num_articles = labels_mask.sum()
+    percent_by_source = [float(len(df.loc[(labels_mask) & (df['source'] == outlet)])) / num_articles for outlet in zip(*outlets)[0]]
     normalized = [percent / np.sum(df['source'] == outlet) for percent, outlet in zip(percent_by_source, zip(*outlets)[0])]
     normalized = [percent / np.sum(normalized) for percent in normalized]
 
@@ -195,7 +199,7 @@ if __name__=='__main__':
     # Plot % of articles mentioning candidate accross all news sources
     # plot_candidate_percentages(df, ['Clinton', 'Trump', 'Bush'])
 
-    tfid, nmf, X, W, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=90, n_features=10000, random_state=1, max_df=0.8, min_df=5)
+    nmf, X, W, W_percent, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=90, n_features=10000, random_state=1, max_df=0.8, min_df=5)
 
     outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
 
