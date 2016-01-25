@@ -110,4 +110,4 @@ if __name__=='__main__':
 
     outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
 
-    predominant_source = print_topic_summary(df, labels_sparse, outlets, topic_words)
+    predominant_source = print_topic_summary(df, labels, outlets, topic_words)
