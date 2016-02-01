@@ -6,6 +6,7 @@ import seaborn as sns
 from PIL import Image
 from wordcloud import WordCloud
 from cluster import topic_word_freq, nmf_articles, print_topic_summary
+from load_data import get_topic_labels, republican_candidates, democrat_candidates
 
 
 def plot_candidate_percentages(df, candidates):
@@ -58,6 +59,7 @@ def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W
         else:
             plt.ylabel('Article Count (Freq = {})'.format(freq), fontsize=12)
         plt.legend(loc='best')
+        plt.title(label)
     elif searchterm and not source:
         ts = pd.Series(df['lemmatized_text'].str.contains(searchterm).astype('int').values, index=df['date_published']).resample(freq, how='sum').fillna(0)
         if not fig:
@@ -193,6 +195,16 @@ def sentiment_source_barchart(df, outlets, ax=None):
     ax.xaxis.set_tick_params(pad=4)
 
 
+def candidate_plots(df, labels, topic_labels, candidate_labels, title, freq='W', show=True):
+    fig = plt.figure(figsize=(12, 8))
+    for candidate in candidate_labels:
+        article_count_by_time(df, topic=(labels, candidate), freq=freq, show=False, fig=fig, label=topic_labels[candidate])
+    plt.legend(loc='best')
+    plt.title(title)
+    if show:
+        plt.show()
+
+
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
@@ -203,14 +215,50 @@ if __name__=='__main__':
 
     outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
 
-    predominant_source = print_topic_summary(df, labels, outlets, topic_words)
+    # predominant_source = print_topic_summary(df, labels, outlets, topic_words)
+
+    # Create a dictionary with the topic labels for creating the plots
+    topic_labels = get_topic_labels()
+    repub_cand = republican_candidates()
+    dem_cand = democrat_candidates()
 
     path = './topic_plots/'
     for idx in xrange(90):
-        print 'Topic {}'.format(str(idx))
+        # If the topic is junk, skip making the plot
+        if topic_labels[idx] == 'junk':
+            print '\n'
+            continue
+        print 'Topic {}: {}'.format(str(idx), topic_labels[idx])
         print topic_words[idx]
         print '\n'
-        topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}'.format(str(idx)), show=False)
-        file_name = path + 'topic_{}.png'.format(idx)
+
+        file_name = path + 'topic_{}_cloud_positivity.png'.format(idx)
+        topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), show=False)
+        plt.savefig(file_name, dpi=250)
+        plt.close()
+
+        file_name = path + 'topic_{}_cloud.png'.format(idx)
+        topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), positivity=False, show=False)
+        plt.savefig(file_name, dpi=250)
+        plt.close()
+
+        file_name = path + 'topic_{}_time_source.png'.format(idx)
+        fig = plt.figure(figsize=(14, 8.5))
+        article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, show=False)
+        plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
+        plt.title('')
+        plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
         plt.savefig(file_name, dpi=300)
         plt.close()
+
+        file_name = path + 'topic_{}_time_source_normalized.png'.format(idx)
+        fig = plt.figure(figsize=(14, 8.5))
+        article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, normalize=True, show=False)
+        plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
+        plt.title('')
+        plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
+        plt.savefig(file_name, dpi=300)
+        plt.close()
+
+    candidate_plots(df, labels, topic_labels, dem_cand, '2016 Democratic Candidates')
+    candidate_plots(df, labels, topic_labels, repub_cand, '2016 Republican Candidates')

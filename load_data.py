@@ -117,118 +117,123 @@ def fix_lemmatized_words():
     'cannabi': 'cannabis',
     'sander': 'sanders',
     'davi': 'davis',
-    'franci': 'francis'
+    'franci': 'francis',
+    'orlean': 'orleans'
     }
     return correct_lemma
 
 
-def topic_labels():
+def get_topic_labels():
     '''
     OUTPUT: dict - A dictionary relating the topic index to a text label describing what the topic is about.
     *** This is only correct when performing the nmf_articles function with the following parameters... nmf_articles(df, n_topics=100, n_features=10000, random_state=1, max_df=0.8, min_df=5).  Without setting the random_state to 1, the order of the subsequent topics will NOT be the same ***
     '''
     topic_label = {
     0: 'junk',
-    1: 'Classified Information', # Related to the Clinton Email Scandal but focuses on the investigation
+    1: "Clinton's Email Server",
     2: 'Donald Trump',
     3: 'Political Polling',
-    4: "Clinton's Email Server",
-    5: 'Taxes / Economy',
-    6: 'Jeb Bush',
-    7: 'Marco Rubio',
-    8: 'Joe Biden',
-    9: 'Political Polling', # Should be combined with topic 3
-    10: 'Super PAC (Political Finance)',
-    11: 'Scott Walker',
-    12: 'Syrian Refugees',
-    13: 'Hillary Clinton',
-    14: 'Planned Parenthood',
-    15: 'Vaccination / Measles Outbreak',
-    16: 'Ted Cruz',
-    17: 'Same-Sex Marriage',
-    18: 'NSA / Bulk Collection',
-    19: 'Ben Carson',
-    20: 'Chris Christie',
-    21: 'Gun Control',
-    22: 'Political Debate',
-    23: 'Carly Fiorina',
-    24: 'Rand Paul',
-    25: 'Iowa Caucuses',
-    26: 'Minimum Wage',
-    27: 'Police Brutality / Black Lives Matter / Baltimore',
-    28: 'Affordable Care Act',
-    29: 'Rick Perry',
-    30: 'Iran Nuclear Deal',
-    31: 'De Blasio', # This is very New York focused
-    32: "Martin O'Malley",
-    33: 'Climate Change / Keystone Pipeline',
-    34: 'Muslim / Ban', # Also mentions Bernadino a bit
-    35: 'Lincoln Chafee',
-    36: 'junk', # Spanish topic
-    37: 'Mitt Romney',
-    38: 'Political Ads',
-    39: 'Barack Obama',
-    40: 'Immigration',
-    41: "Woman's Rights", # You should look up why the term 'beij' is showing up in this topic
-    42: 'John Kasich',
-    43: 'DNC Data Breach',
-    44: 'Mike Huckabee',
-    45: 'Speaker of the House',
-    46: 'Cuban Relations',
-    47: 'Drug Pricing / Martin Shkreli',
-    48: 'Budget',
-    49: 'Bobby Jindal',
-    50: 'Lindsey Graham',
-    51: 'Israeli / Palestinian',
-    52: 'Trans-Pacific Partnership',
-    53: 'Libya Memo (Benghazi)', # This is closely related with the more general Benghazi topic
-    54: 'Koch Brothers',
-    55: 'Lawrence Lessig',
-    56: 'Union / Labor',
-    57: 'Rudy Giuliani',
-    58: 'Jim Webb',
-    59: 'David Wildstein (Bridge Scandal)', # This should probably get combined with the more general Chris Christie Bridge Scandal topic
-    60: 'Charleston / Confederate Flag',
-    61: 'Higher Education',
-    62: 'Gateway Project (Amtrak Rail Corridor)',
-    63: 'Supreme Court',
-    64: 'China',
-    65: 'Congress',
-    66: 'junk',
-    67: 'Clinton Foundation',
-    68: 'Wall Street',
-    69: 'Criminal Justice System',
-    70: 'junk',
-    71: 'junk', # Fox news Power play topic
-    72: 'Political Fundraising',
-    73: 'ISIS (Iraq / Syria)',
-    74: 'State Department (Clinton Aides)', # Rename this one
-    75: 'Talk Shows',
-    76: "Louisiana Governor's Race",
-    77: 'Elizabeth Warren',
-    78: 'junk', # WSJ column
-    79: 'Puerto Rico Bankruptcy',
-    80: 'junk', # Howard Kurtz, Fox news column
-    81: 'Political Parties',
-    82: 'Andrew Cuomo', # You should look into what articles are in here
-    83: 'Marijuana',
-    84: 'Publishing', # Inlucdes 'schweizer' for some reason
-    85: 'Bernie Sanders',
-    86: 'Trump Mexican Comment',
-    87: 'junk', # Fox News Column
-    88: 'Terrorist Attack (Paris / San Bernadino)',
-    89: 'Education System',
-    90: 'Minority Voting',
-    91: 'Religious Liberty',
-    92: 'John McCain', # Heavily connected to Trump's comment about McCain
-    93: 'junk', # NYT, random words
-    94: 'New Hampshire Primary',
-    95: 'Kim Davis',
-    96: 'Theater (junk)',
-    97: 'Pope Francis',
-    98: 'SuperPAC / Political Donations',
-    99: 'Benghazi Committee'
+    4: 'Jeb Bush',
+    5: 'Bernie Sanders',
+    6: 'Taxes / Economy',
+    7: 'Joe Biden',
+    8: 'Chris Christie',
+    9: 'Ben Carson',
+    10: 'Terrorist Attack (Paris / San Bernadino)',
+    11: 'Political Donations',
+    12: 'Gun Control',
+    13: 'Scott Walker',
+    14: 'Ted Cruz',
+    15: 'Super PAC',
+    16: 'junk',
+    17: 'Rand Paul',
+    18: 'Same-Sex Marriage',
+    19: 'Political Debates',
+    20: 'Planned Parenthood',
+    21: 'Iran Nuclear Deal',
+    22: 'Marco Rubio',
+    23: 'Mitt Romney',
+    24: 'Carly Fiorina',
+    25: 'Law Enforcement',
+    26: 'President Obama',
+    27: 'Charleston / Confederate Flag',
+    28: 'Climate Change',
+    29: 'Higher Education',
+    30: 'Syrian Refugees',
+    31: "Martin O'Malley",
+    32: 'NSA / Bulk Collection',
+    33: 'Rick Perry',
+    34: 'Minimum Wage',
+    35: 'Trans-Pacific Partnership',
+    36: 'Lindsey Graham',
+    37: 'Union / Labor',
+    38: 'Cuban Relations',
+    39: 'Affordable Care Act',
+    40: 'Marijuana',
+    41: 'junk', # Spanish topic
+    42: 'Political Ads',
+    43: 'Mike Huckabee',
+    44: 'Gateway Project (Amtrak Rail Corridor)',
+    45: 'Israeli / Palestinian',
+    46: 'Clinton Foundation',
+    47: 'Lincoln Chafee',
+    48: 'Bobby Jindal',
+    49: "Louisiana Governor's Race",
+    50: 'John Kasich',
+    51: 'Howard Kurtz / Journalism',
+    52: 'Black Lives Matter',
+    53: 'Kim Davis',
+    54: 'junk', # Fox news column
+    55: 'Speaker of the House',
+    56: 'Wall Street',
+    57: 'Exxon Settlement',
+    58: 'Pope Francis',
+    59: 'Elizabeth Warren',
+    60: 'New Hampshire Primary',
+    61: 'Theater (junk)',
+    62: 'junk', # WSJ column
+    63: 'ISIS (Iraq / Syria)',
+    64: 'Drug Pricing / Martin Shkreli',
+    65: 'Immigration',
+    66: 'junk', # Various general words
+    67: 'George Pataki',
+    68: 'Jim Webb',
+    69: 'junk', # General journalism words
+    70: 'Libya Memo (Benghazi)', # This is closely related with the more general Benghazi topic
+    71: 'State Department (Benghazi)', # Also closely related to the Benghazi topic
+    72: 'Rick Santorum',
+    73: 'Attorney General',
+    74: 'Iraq War',
+    75: 'Trump Mexican Comment',
+    76: 'Keystone Pipeline',
+    77: 'Political Polling',
+    78: 'Talk Shows',
+    79: 'Russian Relations',
+    80: 'Iowa Cacuses',
+    81: 'De Blasio', # This is very New York focused
+    82: 'Hillary Clinton',
+    83: 'Benghazi Committee',
+    84: "Trump's Muslim Ban",
+    85: 'Supreme Court',
+    86: 'Congress',
+    87: 'Budget',
+    88: 'Political Parties', # This seems to be more focused on the Republican Party
+    89: 'junk' # Just words about when and what time an article was published
     }
     return topic_label
 
-# Both the first two fox article url files had 3157 urls
+
+def republican_candidates():
+    '''
+    Returns a list of the topic numbers cooresponding to each of the respective republican candidates in the order in which they entered the race.
+    NOTE: Jim Gilmore didn't recieve his own topic.  These topic numbers will change once more data is added to the dataframe thereby effecting how the NMF algorithm is factorizing the data.
+    '''
+    return [14, 17, 22, 9, 24, 43, 72, 67, 36, 33, 4, 2, 48, 8, 13, 50]
+
+
+def democrat_candidates():
+    '''
+    Returns a list of the topic numbers cooresponding to each of the respective democratic candidates in the order in which they entered the race.
+    NOTE: Lawrence Lessig didn't recieve his own topic.  Biden is placed at the end because he never actually entered the race.
+    '''
+    return [82, 5, 31, 47, 68, 7]

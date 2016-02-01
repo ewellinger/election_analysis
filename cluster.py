@@ -106,7 +106,7 @@ def document_topics(doc_num, labels, W_percent):
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
-    nmf, X, W, W_percent, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=80, n_features=10000, random_state=1, max_df=0.8, min_df=5)
+    nmf, X, W, W_percent, labels, topic_words, feature_names, reverse_lookup = nmf_articles(df, n_topics=90, n_features=10000, random_state=1, max_df=0.8, min_df=5)
 
     outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
 
