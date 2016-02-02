@@ -59,7 +59,7 @@ Rand Paul      |    04/07/2015     |       N/A
 Marco Rubio    |    04/13/2015     |       N/A
 Ben Carson     |    05/04/2015     |       N/A
 Carly Fiorina  |    05/04/2015     |       N/A
-Mike Huckabee  |    05/05/2015     |       N/A
+Mike Huckabee  |    05/05/2015     |   02/01/2016
 Rick Santorum  |    05/27/2015     |       N/A
 George Pataki  |    05/28/2015     |   12/29/2015
 Lindsey Graham |    06/01/2015     |   12/21/2015
@@ -79,7 +79,7 @@ Candidate       | Announcement Date | Suspension Date
 ----------------|:-----------------:|:--------------:
 Hillary Clinton |    04/12/2015     |       N/A
 Bernie Sanders  |    04/30/2015     |       N/A
-Martin O'Malley |    05/30/2015     |       N/A
+Martin O'Malley |    05/30/2015     |   02/01/2016
 Lincoln Chafee  |    06/03/2015     |   10/23/2015
 Jim Webb        |    07/02/2015     |   10/20/2015
 Lawrence Lessig |    09/06/2015     |   11/02/2015
