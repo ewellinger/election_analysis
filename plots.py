@@ -6,7 +6,7 @@ import seaborn as sns
 from PIL import Image
 from wordcloud import WordCloud
 from cluster import topic_word_freq, nmf_articles, print_topic_summary
-from load_data import get_topic_labels, republican_candidates, democrat_candidates
+from load_data import get_topic_labels
 
 
 def plot_candidate_percentages(df, candidates):
@@ -35,10 +35,11 @@ def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W
     if topic:
         labels, label_num = topic
         df = df.loc[labels[:, label_num]]
+    if not fig:
+        fig = plt.figure(figsize=(12, 8))
+        fig.text(0.08, 0.03, 'Author: Erich Wellinger (github.com/ewellinger/election_analysis)', fontsize=10)
     if not searchterm and not source:
         ts = pd.Series([1], index=df['date_published']).resample(freq, how='sum').fillna(0)
-        if not fig:
-            fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
         ts.plot(marker=marker, label=label)
         plt.xlabel('Date Published ({})'.format(frequency[freq]))
@@ -47,8 +48,6 @@ def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W
         timeseries = [pd.Series([1], index=df.loc[df['source'] == outlet, 'date_published']).resample(freq, how='sum').fillna(0) for outlet in zip(*outlets)[0]]
         if normalize:
             timeseries = [ts / outlet_size for ts, outlet_size in zip(timeseries, outlet_sizes)]
-        if not fig:
-            fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
         for idx, ts in enumerate(timeseries):
             if len(ts):
@@ -62,8 +61,6 @@ def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W
         plt.title(label)
     elif searchterm and not source:
         ts = pd.Series(df['lemmatized_text'].str.contains(searchterm).astype('int').values, index=df['date_published']).resample(freq, how='sum').fillna(0)
-        if not fig:
-            fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
         ts.plot(marker=marker)
         plt.xlabel('Date Published ({})'.format(frequency[freq]), fontsize=12)
@@ -73,8 +70,6 @@ def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W
         timeseries = [pd.Series(df.loc[df['source'] == outlet, 'lemmatized_text'].str.contains(searchterm).astype('int').values, index=df.loc[df['source'] == outlet, 'date_published']).resample(freq, how='sum').fillna(0) for outlet in zip(*outlets)[0]]
         if normalize:
             timeseries = [ts / outlet_size for ts, outlet_size in zip(timeseries, outlet_sizes)]
-        if not fig:
-            fig = plt.figure(figsize=(12, 8))
         plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
         for idx, ts in enumerate(timeseries):
             if len(ts):
@@ -102,6 +97,9 @@ def topic_time_and_cloud(df, topic, feature_names, nmf, title, source=False, nor
     article_count_by_time(df, topic=topic, source=source, normalize=normalize, freq=freq, year=year, fig=fig, show=False)
     ax1.xaxis.labelpad = -4
     plt.suptitle(title, fontsize=20)
+
+    fig.text(0.05, 0.44, 'Author: Erich Wellinger', fontsize=10, alpha=0.7)
+    fig.text(0.33, 0.8, 'github.com/ewellinger/election_analysis', fontsize=20, color='gray', alpha=0.5)
 
     outlets = [('nyt', 'NYT', '#4c72b0'), ('foxnews', 'FOX', '#c44e52'), ('npr', 'NPR', '#55a868'), ('guardian', 'GUA', '#8172b2'), ('wsj', 'WSJ', '#ccb974')]
 
@@ -195,12 +193,17 @@ def sentiment_source_barchart(df, outlets, ax=None):
     ax.xaxis.set_tick_params(pad=4)
 
 
-def candidate_plots(df, labels, topic_labels, candidate_labels, title, freq='W', show=True):
-    fig = plt.figure(figsize=(12, 8))
+def candidate_plots(df, labels, topic_labels, candidate_labels, title, byline=None, freq='W', show=True):
+    fig = plt.figure(figsize=(14, 8))
+    fig.text(0.05, 0.03, 'Author: Erich Wellinger', fontsize=10, alpha=0.7)
+    fig.text(0.33, 0.75, 'github.com/ewellinger/election_analysis', fontsize=20, color='gray', alpha=0.5)
     for candidate in candidate_labels:
-        article_count_by_time(df, topic=(labels, candidate), freq=freq, show=False, fig=fig, label=topic_labels[candidate])
+        article_count_by_time(df, topic=(labels, candidate), freq=freq, show=False, fig=fig, label=topic_labels[candidate], year=True)
     plt.legend(loc='best')
-    plt.title(title)
+    plt.subplots_adjust(left=0.05, bottom=0.1, right=0.97)
+    plt.suptitle(title)
+    if byline:
+        plt.title(byline, fontsize=10)
     if show:
         plt.show()
 
@@ -219,46 +222,46 @@ if __name__=='__main__':
 
     # Create a dictionary with the topic labels for creating the plots
     topic_labels = get_topic_labels()
-    repub_cand = republican_candidates()
-    dem_cand = democrat_candidates()
 
     path = './topic_plots/'
-    for idx in xrange(90):
-        # If the topic is junk, skip making the plot
-        if topic_labels[idx] == 'junk':
-            print '\n'
-            continue
-        print 'Topic {}: {}'.format(str(idx), topic_labels[idx])
-        print topic_words[idx]
-        print '\n'
+    # for idx in xrange(90):
+    #     # If the topic is junk, skip making the plot
+    #     if topic_labels[idx] == 'junk':
+    #         print '\n'
+    #         continue
+    #     print 'Topic {}: {}'.format(str(idx), topic_labels[idx])
+    #     print topic_words[idx]
+    #     print '\n'
+    #
+    #     file_name = path + 'topic_{}_cloud_positivity.png'.format(idx)
+    #     topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), show=False)
+    #     plt.savefig(file_name, dpi=250)
+    #     plt.close()
+    #
+    #     file_name = path + 'topic_{}_cloud.png'.format(idx)
+    #     topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), positivity=False, show=False)
+    #     plt.savefig(file_name, dpi=250)
+    #     plt.close()
+    #
+    #     file_name = path + 'topic_{}_time_source.png'.format(idx)
+    #     fig = plt.figure(figsize=(14, 8.5))
+    #     article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, show=False)
+    #     plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
+    #     plt.title('')
+    #     plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
+    #     plt.savefig(file_name, dpi=300)
+    #     plt.close()
+    #
+    #     file_name = path + 'topic_{}_time_source_normalized.png'.format(idx)
+    #     fig = plt.figure(figsize=(14, 8.5))
+    #     article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, normalize=True, show=False)
+    #     plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
+    #     plt.title('')
+    #     plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
+    #     plt.savefig(file_name, dpi=300)
+    #     plt.close()
 
-        file_name = path + 'topic_{}_cloud_positivity.png'.format(idx)
-        topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), show=False)
-        plt.savefig(file_name, dpi=250)
-        plt.close()
-
-        file_name = path + 'topic_{}_cloud.png'.format(idx)
-        topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), positivity=False, show=False)
-        plt.savefig(file_name, dpi=250)
-        plt.close()
-
-        file_name = path + 'topic_{}_time_source.png'.format(idx)
-        fig = plt.figure(figsize=(14, 8.5))
-        article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, show=False)
-        plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
-        plt.title('')
-        plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
-        plt.savefig(file_name, dpi=300)
-        plt.close()
-
-        file_name = path + 'topic_{}_time_source_normalized.png'.format(idx)
-        fig = plt.figure(figsize=(14, 8.5))
-        article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, normalize=True, show=False)
-        plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
-        plt.title('')
-        plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
-        plt.savefig(file_name, dpi=300)
-        plt.close()
-
-    candidate_plots(df, labels, topic_labels, dem_cand, '2016 Democratic Candidates')
-    candidate_plots(df, labels, topic_labels, repub_cand, '2016 Republican Candidates')
+    # Create candidate plot for the remaining democratic candidates
+    candidate_plots(df, labels, topic_labels, [82, 5], 'Remaining 2016 Democratic Candidates', byline='As of February 1, 2016')
+    # Create candidate plot for top 5 republican canidates (as of February 1st, 2016)
+    candidate_plots(df, labels, topic_labels, [2, 14, 22, 9, 4], 'Top 5 Polling 2016 Republican Candidates', byline='As of February 1, 2016')
