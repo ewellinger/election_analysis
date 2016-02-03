@@ -221,19 +221,3 @@ def get_topic_labels():
     89: 'junk' # Just words about when and what time an article was published
     }
     return topic_label
-
-
-def republican_candidates():
-    '''
-    Returns a list of the topic numbers cooresponding to each of the respective republican candidates in the order in which they entered the race.
-    NOTE: Jim Gilmore didn't recieve his own topic.  These topic numbers will change once more data is added to the dataframe thereby effecting how the NMF algorithm is factorizing the data.
-    '''
-    return [14, 17, 22, 9, 24, 43, 72, 67, 36, 33, 4, 2, 48, 8, 13, 50]
-
-
-def democrat_candidates():
-    '''
-    Returns a list of the topic numbers cooresponding to each of the respective democratic candidates in the order in which they entered the race.
-    NOTE: Lawrence Lessig didn't recieve his own topic.  Biden is placed at the end because he never actually entered the race.
-    '''
-    return [82, 5, 31, 47, 68, 7]
