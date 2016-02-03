@@ -55,7 +55,7 @@ Other Possible News Outlets To Include:
 Candidate      | Announcement Date | Suspension Date
 ---------------|:-----------------:|:--------------:
 Ted Cruz       |    03/23/2015     |       N/A
-Rand Paul      |    04/07/2015     |       N/A
+Rand Paul      |    04/07/2015     |   02/03/2016
 Marco Rubio    |    04/13/2015     |       N/A
 Ben Carson     |    05/04/2015     |       N/A
 Carly Fiorina  |    05/04/2015     |       N/A
