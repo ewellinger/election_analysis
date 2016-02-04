@@ -224,44 +224,53 @@ if __name__=='__main__':
     topic_labels = get_topic_labels()
 
     path = './topic_plots/'
-    # for idx in xrange(90):
-    #     # If the topic is junk, skip making the plot
-    #     if topic_labels[idx] == 'junk':
-    #         print '\n'
-    #         continue
-    #     print 'Topic {}: {}'.format(str(idx), topic_labels[idx])
-    #     print topic_words[idx]
-    #     print '\n'
-    #
-    #     file_name = path + 'topic_{}_cloud_positivity.png'.format(idx)
-    #     topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), show=False)
-    #     plt.savefig(file_name, dpi=250)
-    #     plt.close()
-    #
-    #     file_name = path + 'topic_{}_cloud.png'.format(idx)
-    #     topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), positivity=False, show=False)
-    #     plt.savefig(file_name, dpi=250)
-    #     plt.close()
-    #
-    #     file_name = path + 'topic_{}_time_source.png'.format(idx)
-    #     fig = plt.figure(figsize=(14, 8.5))
-    #     article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, show=False)
-    #     plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
-    #     plt.title('')
-    #     plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
-    #     plt.savefig(file_name, dpi=300)
-    #     plt.close()
-    #
-    #     file_name = path + 'topic_{}_time_source_normalized.png'.format(idx)
-    #     fig = plt.figure(figsize=(14, 8.5))
-    #     article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, normalize=True, show=False)
-    #     plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
-    #     plt.title('')
-    #     plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
-    #     plt.savefig(file_name, dpi=300)
-    #     plt.close()
+    for idx in xrange(90):
+        # If the topic is junk, skip making the plot
+        if topic_labels[idx] == 'junk':
+            print '\n'
+            continue
+        print 'Topic {}: {}'.format(str(idx), topic_labels[idx])
+        print topic_words[idx]
+        print '\n'
+
+        file_name = path + 'topic_{}_cloud_positivity.png'.format(idx)
+        topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), show=False)
+        plt.savefig(file_name, dpi=250)
+        plt.close()
+
+        file_name = path + 'topic_{}_cloud.png'.format(idx)
+        topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), positivity=False, show=False)
+        plt.savefig(file_name, dpi=250)
+        plt.close()
+
+        file_name = path + 'topic_{}_time_source.png'.format(idx)
+        fig = plt.figure(figsize=(14, 8.5))
+        fig.text(0.05, 0.03, 'Author: Erich Wellinger', fontsize=10, alpha=0.7)
+        fig.text(0.33, 0.75, 'github.com/ewellinger/election_analysis', fontsize=20, color='gray', alpha=0.5)
+        article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, show=False)
+        plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
+        plt.title('')
+        plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
+        plt.savefig(file_name, dpi=300)
+        plt.close()
+
+        file_name = path + 'topic_{}_time_source_normalized.png'.format(idx)
+        fig = plt.figure(figsize=(14, 8.5))
+        fig.text(0.05, 0.03, 'Author: Erich Wellinger', fontsize=10, alpha=0.7)
+        fig.text(0.33, 0.75, 'github.com/ewellinger/election_analysis', fontsize=20, color='gray', alpha=0.5)
+        article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, normalize=True, show=False)
+        plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
+        plt.title('')
+        plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
+        plt.savefig(file_name, dpi=300)
+        plt.close()
 
     # Create candidate plot for the remaining democratic candidates
-    candidate_plots(df, labels, topic_labels, [82, 5], 'Remaining 2016 Democratic Candidates', byline='As of February 1, 2016')
+    candidate_plots(df, labels, topic_labels, [82, 5], 'Remaining 2016 Democratic Candidates', byline='As of February 1, 2016', show=False)
+    plt.savefig('./candidate_plots/democrat.png', dpi=350)
+    plt.close()
+
     # Create candidate plot for top 5 republican canidates (as of February 1st, 2016)
-    candidate_plots(df, labels, topic_labels, [2, 14, 22, 9, 4], 'Top 5 Polling 2016 Republican Candidates', byline='As of February 1, 2016')
+    candidate_plots(df, labels, topic_labels, [2, 14, 22, 9, 4], 'Top 5 Polling 2016 Republican Candidates', byline='As of February 1, 2016', show=False)
+    plt.savefig('./candidate_plots/republican.png', dpi=350)
+    plt.close()

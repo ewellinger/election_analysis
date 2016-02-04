@@ -85,6 +85,14 @@ Jim Webb        |    07/02/2015     |   10/20/2015
 Lawrence Lessig |    09/06/2015     |   11/02/2015
 Joe Biden       |        N/A        |   10/21/2015
 
+Below we can see how the media coverage of select candidates compares over the course of 2015.  For brevity only a select few candidates were included on each plot.
+
+![republican_candidates](./candidate_plots/republican.png "Coverage of Top 5 Polling Republican Candidates As Of February 1st, 2016")
+
+
+![democratic_candidates](./candidate_plots/democrat.png "Coverage of Remaining Democratic Candidates As Of February 1st, 2016")
+
+
 ---
 
 ### Data Cleaning
