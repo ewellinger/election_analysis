@@ -60,7 +60,7 @@ Marco Rubio    |    04/13/2015     |       N/A
 Ben Carson     |    05/04/2015     |       N/A
 Carly Fiorina  |    05/04/2015     |       N/A
 Mike Huckabee  |    05/05/2015     |   02/01/2016
-Rick Santorum  |    05/27/2015     |       N/A
+Rick Santorum  |    05/27/2015     |   02/03/2016
 George Pataki  |    05/28/2015     |   12/29/2015
 Lindsey Graham |    06/01/2015     |   12/21/2015
 Rick Perry     |    06/04/2015     |   09/11/2015
