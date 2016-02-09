@@ -7,6 +7,7 @@ from PIL import Image
 from wordcloud import WordCloud
 from cluster import topic_word_freq, nmf_articles, print_topic_summary
 from load_data import get_topic_labels
+from shooting import create_shootings_df
 
 
 def plot_candidate_percentages(df, candidates):
@@ -36,11 +37,12 @@ def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W
         labels, label_num = topic
         df = df.loc[labels[:, label_num]]
     if not fig:
-        fig = plt.figure(figsize=(12, 8))
-        fig.text(0.08, 0.03, 'Author: Erich Wellinger (github.com/ewellinger/election_analysis)', fontsize=10)
+        fig = plt.figure(figsize=(14, 8))
+        fig.text(0.05, 0.03, 'Author: Erich Wellinger', fontsize=10, alpha=0.7)
+        fig.text(0.33, 0.75, 'github.com/ewellinger/election_analysis', fontsize=20, color='gray', alpha=0.5)
     if not searchterm and not source:
         ts = pd.Series([1], index=df['date_published']).resample(freq, how='sum').fillna(0)
-        plt.subplots_adjust(left=0.08, bottom=0.12, right=0.95, top=0.92)
+        plt.subplots_adjust(left=0.05, bottom=0.1, right=0.97, top=0.92)
         ts.plot(marker=marker, label=label)
         plt.xlabel('Date Published ({})'.format(frequency[freq]))
         plt.ylabel('Article Count (freq={})'.format(freq))
@@ -112,6 +114,7 @@ def topic_time_and_cloud(df, topic, feature_names, nmf, title, source=False, nor
 
     plt.title('Number of Articles in Topic: {}'.format(num_articles), x=0.4825)
 
+    ''' You should incorporate the word_cloud function in here!!! '''
     if not positivity:
         ax2 = fig.add_axes([0.025, 0, 0.79, 0.43])
         wc = WordCloud(background_color='white', max_words=max_words, width=1900, height=625)
@@ -135,6 +138,7 @@ def topic_time_and_cloud(df, topic, feature_names, nmf, title, source=False, nor
             ax4.set_title('')
     if show:
         plt.show()
+    return ax1
 
 
 def normalized_source_barchart(df, topic, outlets, ax=None):
@@ -208,6 +212,24 @@ def candidate_plots(df, labels, topic_labels, candidate_labels, title, byline=No
         plt.show()
 
 
+def word_cloud(nmf, topic_num, feature_names, max_words=300, figsize=(14, 8), width=2400, height=1300, ax=None, show=True):
+    # Create the WordCloud object
+    wc = WordCloud(background_color='white', max_words=max_words, width=width, height=height)
+    word_freq = topic_word_freq(nmf.components_, topic_num, feature_names)
+
+    # Fit the WordCloud object to the specific topics word frequencies
+    wc.fit_words(word_freq)
+
+    # Create the matplotlib figure and axis if they weren't passed in
+    if not ax:
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(111)
+    ax.imshow(wc)
+    ax.axis('off')
+    if show:
+        plt.show()
+
+
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
@@ -223,54 +245,69 @@ if __name__=='__main__':
     # Create a dictionary with the topic labels for creating the plots
     topic_labels = get_topic_labels()
 
-    path = './topic_plots/'
-    for idx in xrange(90):
-        # If the topic is junk, skip making the plot
-        if topic_labels[idx] == 'junk':
-            print '\n'
-            continue
-        print 'Topic {}: {}'.format(str(idx), topic_labels[idx])
-        print topic_words[idx]
-        print '\n'
+    # path = './topic_plots/'
+    # for idx in xrange(90):
+    #     # If the topic is junk, skip making the plot
+    #     if topic_labels[idx] == 'junk':
+    #         print '\n'
+    #         continue
+    #     print 'Topic {}: {}'.format(str(idx), topic_labels[idx])
+    #     print topic_words[idx]
+    #     print '\n'
+    #
+    #     file_name = path + 'topic_{}_cloud_positivity.png'.format(idx)
+    #     topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), show=False)
+    #     plt.savefig(file_name, dpi=250)
+    #     plt.close()
+    #
+    #     file_name = path + 'topic_{}_cloud.png'.format(idx)
+    #     topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), positivity=False, show=False)
+    #     plt.savefig(file_name, dpi=250)
+    #     plt.close()
+    #
+    #     file_name = path + 'topic_{}_time_source.png'.format(idx)
+    #     fig = plt.figure(figsize=(14, 8.5))
+    #     fig.text(0.05, 0.03, 'Author: Erich Wellinger', fontsize=10, alpha=0.7)
+    #     fig.text(0.33, 0.75, 'github.com/ewellinger/election_analysis', fontsize=20, color='gray', alpha=0.5)
+    #     article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, show=False)
+    #     plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
+    #     plt.title('')
+    #     plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
+    #     plt.savefig(file_name, dpi=300)
+    #     plt.close()
+    #
+    #     file_name = path + 'topic_{}_time_source_normalized.png'.format(idx)
+    #     fig = plt.figure(figsize=(14, 8.5))
+    #     fig.text(0.05, 0.03, 'Author: Erich Wellinger', fontsize=10, alpha=0.7)
+    #     fig.text(0.33, 0.75, 'github.com/ewellinger/election_analysis', fontsize=20, color='gray', alpha=0.5)
+    #     article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, normalize=True, show=False)
+    #     plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
+    #     plt.title('')
+    #     plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
+    #     plt.savefig(file_name, dpi=300)
+    #     plt.close()
+    #
+    # # Create candidate plot for the remaining democratic candidates
+    # candidate_plots(df, labels, topic_labels, [82, 5], 'Remaining 2016 Democratic Candidates', byline='As of February 1, 2016', show=False)
+    # plt.savefig('./candidate_plots/democrat.png', dpi=350)
+    # plt.close()
+    #
+    # # Create candidate plot for top 5 republican canidates (as of February 1st, 2016)
+    # candidate_plots(df, labels, topic_labels, [2, 14, 22, 9, 4], 'Top 5 Polling 2016 Republican Candidates', byline='As of February 1, 2016', show=False)
+    # plt.savefig('./candidate_plots/republican.png', dpi=350)
+    # plt.close()
 
-        file_name = path + 'topic_{}_cloud_positivity.png'.format(idx)
-        topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), show=False)
-        plt.savefig(file_name, dpi=250)
-        plt.close()
 
-        file_name = path + 'topic_{}_cloud.png'.format(idx)
-        topic_time_and_cloud(df, (labels, idx), feature_names, nmf, 'Label {}: {}'.format(str(idx), topic_labels[idx]), positivity=False, show=False)
-        plt.savefig(file_name, dpi=250)
-        plt.close()
+# Make the gun control plot
+topic_time_and_cloud(df, (labels, 12), feature_names, nmf, 'Label {}: {}'.format(12, topic_labels[12]), positivity=False, show=False)
+msdf = create_shootings_df()
 
-        file_name = path + 'topic_{}_time_source.png'.format(idx)
-        fig = plt.figure(figsize=(14, 8.5))
-        fig.text(0.05, 0.03, 'Author: Erich Wellinger', fontsize=10, alpha=0.7)
-        fig.text(0.33, 0.75, 'github.com/ewellinger/election_analysis', fontsize=20, color='gray', alpha=0.5)
-        article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, show=False)
-        plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
-        plt.title('')
-        plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
-        plt.savefig(file_name, dpi=300)
-        plt.close()
 
-        file_name = path + 'topic_{}_time_source_normalized.png'.format(idx)
-        fig = plt.figure(figsize=(14, 8.5))
-        fig.text(0.05, 0.03, 'Author: Erich Wellinger', fontsize=10, alpha=0.7)
-        fig.text(0.33, 0.75, 'github.com/ewellinger/election_analysis', fontsize=20, color='gray', alpha=0.5)
-        article_count_by_time(df, topic=(labels, idx), year=True, source=True, fig=fig, normalize=True, show=False)
-        plt.subplots_adjust(left=0.05, bottom=0.10, right=0.97, top=0.94)
-        plt.title('')
-        plt.suptitle('Label {}: {}'.format(str(idx), topic_labels[idx]), fontsize=14)
-        plt.savefig(file_name, dpi=300)
-        plt.close()
-
-    # Create candidate plot for the remaining democratic candidates
-    candidate_plots(df, labels, topic_labels, [82, 5], 'Remaining 2016 Democratic Candidates', byline='As of February 1, 2016', show=False)
-    plt.savefig('./candidate_plots/democrat.png', dpi=350)
-    plt.close()
-
-    # Create candidate plot for top 5 republican canidates (as of February 1st, 2016)
-    candidate_plots(df, labels, topic_labels, [2, 14, 22, 9, 4], 'Top 5 Polling 2016 Republican Candidates', byline='As of February 1, 2016', show=False)
-    plt.savefig('./candidate_plots/republican.png', dpi=350)
-    plt.close()
+article_count_by_time(df, topic=(labels, 12), year=True, show=False)
+c_list = sns.color_palette("Set1", n_colors=10, desat=.8).as_hex()
+idxs = [0, 2, 4, 12, 13, 30, 38]
+for c_idx, idx in enumerate(idxs):
+    label = '{} {}: {} Killed, {} Injured'.format(idx+1, msdf.loc[idx, 'city_county'], msdf.loc[idx, 'killed'], msdf.loc[idx, 'injured'])
+    plt.axvline(x=msdf.loc[idx, 'date'], label=label, c=c_list[c_idx], lw=3, alpha=0.8)
+plt.legend(loc='best')
+plt.show()
