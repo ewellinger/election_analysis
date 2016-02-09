@@ -73,7 +73,7 @@ John Kasich    |    07/21/2015     |       N/A
 Jim Gilmore    |    07/30/2015     |       N/A
 
 
-#### Democrat
+#### Democratic
 
 Candidate       | Announcement Date | Suspension Date
 ----------------|:-----------------:|:--------------:
