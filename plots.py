@@ -96,7 +96,7 @@ def article_count_by_time(df, searchterm=None, topic=None, source=False, freq='W
 def topic_time_and_cloud(df, topic, feature_names, nmf, title, source=False, normalize=False, freq='W', year=True, max_words=300, positivity=True, show=True):
     fig = plt.figure(figsize=(14, 8.5))
     ax1 = fig.add_axes([0.05, 0.5, 0.93, 0.41])
-    article_count_by_time(df, topic=topic, source=source, normalize=normalize, freq=freq, year=year, fig=fig, show=False)
+    article_count_by_time(df, topic=topic, source=source, normalize=normalize, freq=freq, year=year, fig=fig, label=topic_labels[topic[1]], show=False)
     ax1.xaxis.labelpad = -4
     plt.suptitle(title, fontsize=20)
 
@@ -298,16 +298,14 @@ if __name__=='__main__':
     # plt.close()
 
 
-# Make the gun control plot
-topic_time_and_cloud(df, (labels, 12), feature_names, nmf, 'Label {}: {}'.format(12, topic_labels[12]), positivity=False, show=False)
-msdf = create_shootings_df()
-
-
-article_count_by_time(df, topic=(labels, 12), year=True, show=False)
-c_list = sns.color_palette("Set1", n_colors=10, desat=.8).as_hex()
-idxs = [0, 2, 4, 12, 13, 30, 38]
-for c_idx, idx in enumerate(idxs):
-    label = '{} {}: {} Killed, {} Injured'.format(idx+1, msdf.loc[idx, 'city_county'], msdf.loc[idx, 'killed'], msdf.loc[idx, 'injured'])
-    plt.axvline(x=msdf.loc[idx, 'date'], label=label, c=c_list[c_idx], lw=3, alpha=0.8)
-plt.legend(loc='best')
-plt.show()
+    # # Make the gun control plot
+    # ax = topic_time_and_cloud(df, (labels, 12), feature_names, nmf, 'Label {}: {}'.format(12, topic_labels[12]), positivity=False, show=False)
+    # msdf = create_shootings_df()
+    # # article_count_by_time(df, topic=(labels, 12), year=True, show=False)
+    # c_list = sns.color_palette("Set1", n_colors=10).as_hex()
+    # idxs = [0, 2, 4, 12, 13, 30, 38]
+    # for c_idx, idx in enumerate(idxs):
+    #     label = '{} {}: {} Killed, {} Injured'.format(idx+1, msdf.loc[idx, 'city_county'], msdf.loc[idx, 'killed'], msdf.loc[idx, 'injured'])
+    #     ax.axvline(x=msdf.loc[idx, 'date'], label=label, c=c_list[c_idx], lw=3, alpha=0.8)
+    # ax.legend(loc='best')
+    # plt.savefig('plots/Gun_Control.png', dpi=300)
