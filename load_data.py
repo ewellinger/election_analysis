@@ -38,35 +38,43 @@ def get_canidate_names_2016():
     return '|'.join(keywords)
 
 
-def get_dates(start_mon=1, end_mon=12, start_day=1, end_day=None):
-    if not end_day:
-        end_day = days_in_month[end_mon]
-    start_date = '2015-{0}-{1}'.format(get_num_str(start_mon), get_num_str(start_day))
-    end_date = '2015-{0}-{1}'.format(get_num_str(end_mon), get_num_str(end_day))
-
+def get_dates(start_date, end_date):
+    ''' Returns a list of dates in 'YYYY-MM-DD' format
+    INPUT:
+        start_date - string in 'YYYY-MM-DD' or 'YYYY-M-DD' format
+        end_date - string in 'YYYY-MM-DD' or 'YYYY-M-DD' format
+    OUTPUT:
+        list of date strings at a daily frequency
+    '''
     date_range = pd.date_range(start_date, end_date, freq='D')
     date_range = [date.strftime('%Y-%m-%d') for date in date_range]
     return date_range
 
 
-def get_week_tuples(start_mon=1, end_mon=12):
-    date = ('2015-{}-01'.format(get_num_str(start_mon)), '2015-{0}-{1}'.format(get_num_str(end_mon), get_num_str(days_in_month[end_mon])))
-    date_range = pd.date_range(date[0], date[1], freq='W')
+def get_week_tuples(start_date, end_date):
+    ''' Returns a list of weekly tuples
+    INPUT:
+        start_date - string in 'YYYY-MM-DD' or 'YYYY-M-DD' format
+        end_date - string in 'YYYY-MM-DD' or 'YYYY-M-DD' format
+    OUPUT:
+        list of string tuples representing dates at a weekly frequency (except for the first and last which will capture any days that started or ended mid-week) in ('YYYY-MM-DD', 'YYYY-MM-DD') format
+    '''
+    # Ensure that the date strings are in YYYY-MM-DD format
+    start_date = pd.to_datetime(start_date).strftime('%Y-%m-%d')
+    end_date = pd.to_datetime(end_date).strftime('%Y-%m-%d')
+
+    # Create list of dates at a weekly frequency
+    date_range = pd.date_range(start_date, end_date, freq='W')
     date_range = [date.strftime('%Y-%m-%d') for date in date_range]
-    result = [('2015-'+get_num_str(start_mon)+'-01', date_range[0])]
-    for i in zip(date_range[:], date_range[1:]):
-        result.append(i)
-    result.append((date_range[-1], '2015-'+get_num_str(end_mon)+ '-' + get_num_str(days_in_month[end_mon])))
+
+    # Create a list of weekly tuples that includes both the starting and ending dates
+    result = []
+    if start_date != date_range[0]:
+        result.append((start_date, date_range[0]))
+    result.extend(zip(date_range[:], date_range[1:]))
+    if end_date != date_range[-1]:
+        result.append((date_range[-1], end_date))
     return result
-
-days_in_month = {1: 31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}
-
-
-def get_num_str(num):
-    if len(str(num)) == 1:
-        return '0' + str(num)
-    else:
-        return str(num)
 
 
 # Load list from file
