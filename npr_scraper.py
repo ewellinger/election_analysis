@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from requests import get
 from unidecode import unidecode
 from load_data import get_keywords_2016, get_dates
+from sys import argv
 import threading
 import os
 # Import NPR API Access key from zsh profile
@@ -95,9 +96,19 @@ if __name__=='__main__':
     # Initialize the Database
     db = client['election_analysis']
     # Initialize table
-    tab = db['articles']
+    # If a table name has been provided use that, otherwise initialize 'articles' table
+    if len(argv) > 3:
+        tab = db[argv[3]]
+    else:
+        tab = db['articles']
 
-    dates = get_dates(start_mon=12)
+    start_date, end_date = argv[1], argv[2]
+    print 'Scraping NPR from {0} to {1}'.format(start_date, end_date)
+
+    dates = get_dates(start_date, end_date)
     keywords = get_keywords_2016()
 
     num_bad_extractions = concurrent_scrape_npr(tab, keywords, dates)
+
+    print 'NPR Scraping Done...'
+    print 'Number of Bad Extractions = {0}'.format(num_bad_extractions)
