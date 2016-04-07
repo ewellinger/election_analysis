@@ -2,7 +2,8 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import json
 import threading
-from load_data import get_keywords_2016, get_dates
+from load_data import get_keywords_2016, get_dates, get_file_name
+from sys import argv
 
 
 def get_urls_from_search(driver, searchterm, date, attempt=0):
@@ -98,8 +99,11 @@ if __name__ == '__main__':
     # Get all the keywords to search for
     searchterms = get_keywords_2016()
 
-    # Get dates to search over (all of 2015)
-    dates = get_dates()
+    start_date, end_date = argv[1], argv[2]
+    print 'Scraping Fox News from {0} to {1}'.format(start_date, end_date)
+
+    # Get dates to search over
+    dates = get_dates(start_date, end_date)
 
     # Initialize empty lists for urls to be appended to
     good_urls, bad_urls = set(), set()
@@ -117,7 +121,18 @@ if __name__ == '__main__':
     good_urls, bad_urls = concurrent_get_urls(
         searchterms[20:], dates, good_urls, bad_urls)
 
+    print 'Fox Scraping Done...'
+
     # Convert good_urls set to a list and write to a txt file
-    with open('./url_files/fox_article_urls_2015.txt', 'w') as f:
+    file_path = './url_files/{0}'.format(get_file_name('fox', start_date, end_date))
+    with open(file_path, 'w') as f:
         f.write(json.dumps(list(good_urls)))
         f.close()
+
+    # If there are any bad URLs, print how many there were and write them to a file for review
+    print 'Number of Bad URLs = {0}'.format(len(bad_urls))
+    if len(bad_urls):
+        file_path = './url_files/{0}'.format(get_file_name('fox', start_date, end_date, bad=True))
+        with open(file_path, 'w') as f:
+            f.write(json.dumps(list(bad_urls)))
+            f.close()
