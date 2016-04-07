@@ -77,6 +77,17 @@ def get_week_tuples(start_date, end_date):
     return result
 
 
+def get_file_name(source, start_date, end_date, bad=False):
+    ''' Returns a filename for a given search (e.g. fox_20160101_20160201.txt) '''
+    # Ensure that the date strings are in YYYYMMDD format
+    start_date = pd.to_datetime(start_date).strftime('%Y%m%d')
+    end_date = pd.to_datetime(end_date).strftime('%Y%m%d')
+    if bad:
+        return '{0}_{1}_{2}_bad.txt'.format(source, start_date, end_date)
+    else:
+        return '{0}_{1}_{2}.txt'.format(source, start_date, end_date)
+
+
 # Load list from file
 def load_urls(filename):
     urls = ''
