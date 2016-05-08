@@ -10,9 +10,21 @@ api_key = os.environ['NPR_ACCESS_KEY']
 
 
 def single_query(searchterm, date, start_num=0):
-    searchterm = searchterm.replace(' ', '%20')
-    url = 'http://api.npr.org/query?id=1014,1003&fields=all&requiredAssets=text&date={0}&searchTerm={1}&startNum={2}&dateType=story&output=JSON&numResults=20&searchType=fullContent&apiKey={3}'.format(date, searchterm, start_num, api_key)
-    response = get(url)
+    payload = {
+        'id': '1014,1003',
+        'fields': 'all',
+        'requiredAssets': 'text',
+        'date': date,
+        'searchTerm': searchterm,
+        'startNum': start_num,
+        'dateType': 'story',
+        'output': 'JSON',
+        'numResults': 20,
+        'searchType': 'fullContent',
+        'apiKey': api_key
+    }
+    url = 'http://api.npr.org/query'
+    response = get(url, params=payload)
     if response.status_code != 200:
         print 'WARNING', response.status_code
     else:
@@ -91,6 +103,10 @@ def concurrent_scrape_npr(tab, searchterms, dates):
 
 
 if __name__=='__main__':
+    ''' This script should be called in the following way:
+    $ python npr_scraper.py 'startdate' 'enddate' 'table (optional)'
+    '''
+
     # Create MongoClient
     client = MongoClient()
     # Initialize the Database

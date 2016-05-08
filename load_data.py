@@ -101,7 +101,7 @@ def load_urls(filename):
 
 
 def parse_str(x):
-    if type(x) == unicode:
+    if isinstance(x, unicode):
         return unidecode(x)
     else:
         return str(x)

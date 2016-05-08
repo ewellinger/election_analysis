@@ -7,7 +7,7 @@ from PIL import Image
 from wordcloud import WordCloud
 from cluster import topic_word_freq, nmf_articles, print_topic_summary
 from load_data import get_topic_labels
-from shooting import create_shootings_df
+from shootings import create_shootings_df
 
 
 def plot_candidate_percentages(df, candidates):
@@ -298,14 +298,18 @@ if __name__=='__main__':
     # plt.close()
 
 
-    # # Make the gun control plot
-    # ax = topic_time_and_cloud(df, (labels, 12), feature_names, nmf, 'Label {}: {}'.format(12, topic_labels[12]), positivity=False, show=False)
-    # msdf = create_shootings_df()
-    # # article_count_by_time(df, topic=(labels, 12), year=True, show=False)
-    # c_list = sns.color_palette("Set1", n_colors=10).as_hex()
+    # Make the gun control plot
+    ax = topic_time_and_cloud(df, (labels, 12), feature_names, nmf, 'Label {}: {}'.format(12, topic_labels[12]), positivity=False, show=False)
+    msdf = create_shootings_df()
+    # article_count_by_time(df, topic=(labels, 12), year=True, show=False)
+    c_list = sns.color_palette("Set1", n_colors=10).as_hex()
     # idxs = [0, 2, 4, 12, 13, 30, 38]
     # for c_idx, idx in enumerate(idxs):
-    #     label = '{} {}: {} Killed, {} Injured'.format(idx+1, msdf.loc[idx, 'city_county'], msdf.loc[idx, 'killed'], msdf.loc[idx, 'injured'])
-    #     ax.axvline(x=msdf.loc[idx, 'date'], label=label, c=c_list[c_idx], lw=3, alpha=0.8)
-    # ax.legend(loc='best')
-    # plt.savefig('plots/Gun_Control.png', dpi=300)
+        # label = '{} {}: {} Killed, {} Injured'.format(idx+1, msdf.loc[idx, 'city_county'], msdf.loc[idx, 'killed'], msdf.loc[idx, 'injured'])
+        # ax.axvline(x=msdf.loc[idx, 'date'], label=label, c=c_list[c_idx], lw=3, alpha=0.8)
+
+    for idx in xrange(5):
+        label = '{}: {} ({} Killed, {} Injured)'.format(idx+1, msdf.loc[idx, 'city_county'], msdf.loc[idx, 'killed'], msdf.loc[idx, 'injured'])
+        ax.axvline(x=msdf.loc[idx, 'date'], label=label, c=c_list[idx], lw=3, alpha=0.8)
+    ax.legend(loc='best')
+    plt.savefig('plots/Gun_Control2.png', dpi=300)

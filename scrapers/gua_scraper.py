@@ -3,16 +3,26 @@ from requests import get
 from unidecode import unidecode
 from load_data import get_week_tuples, get_keywords_2016
 import os
+from sys import argv
 from time import sleep
-
 # Import Guardian API Access key
 api_key = os.environ['GUARDIAN_ACCESS_KEY']
 
 
 def single_query(searchterm, date):
-    searchterm = searchterm.replace(' ', '%20')
-    url = 'http://content.guardianapis.com/search?q={0}&format=json&section=us-news&from-date={1}&to-date={2}&page-size=200&show-references=author&show-blocks=body&api-key={3}'.format(searchterm, date[0], date[1], api_key)
-    response = get(url)
+    payload = {
+        'q': searchterm,
+        'format': 'json',
+        'section': 'us-news',
+        'from-date': date[0],
+        'to-date': date[1],
+        'page-size': 200,
+        'show-references': 'author',
+        'show-blocks': 'body'
+        'api-key': api_key
+    }
+    url = 'http://content.guardianapis.com/search'
+    response = get(url, params=payload)
     if response.status_code != 200:
         print 'WARNING', response.status_code
         return False, ''
@@ -77,14 +87,25 @@ def already_exists(tab, url):
 
 
 if __name__=='__main__':
+    ''' This script should be called in the following way:
+    $ python gua_scraper.py 'startdate' 'enddate' 'table (optional)'
+    '''
+
     # Create MongoClient
     client = MongoClient()
     # Initialize the Database
     db = client['election_analysis']
     # Initialize table
-    tab = db['articles']
+    # If a table name has been provided use that, otherwise initialize 'articles' table
+    if len(argv) > 3:
+        tab = db[argv[3]]
+    else:
+        tab = db['articles']
 
-    dates = get_week_tuples(start_mon=12)
+    start_date, end_date = argv[1], argv[2]
+    print 'Scraping the Guardian from {0} to {1}'.format(start_date, end_date)
+
+    dates = get_week_tuples(start_date, end_date)
     searchterms = get_keywords_2016()
 
     for searchterm in searchterms:
