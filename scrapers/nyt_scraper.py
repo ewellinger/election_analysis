@@ -1,19 +1,25 @@
 from pymongo import MongoClient
 from load_data import get_keywords_2016, get_week_tuples, parse_str
 from requests import get
-from unidecode import unidecode
 from bs4 import BeautifulSoup
 from time import sleep
 import os
+from sys import argv
 # Import NYT API Access key from zsh profile
 api_key = os.environ['NYT_ACCESS_KEY']
 
 
 def single_query(searchterm, date_tup, page=0):
-    searchterm = searchterm.replace(' ', '+')
-    url = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?q={0}&begin_date={1}&end_date={2}&page={3}&api-key={4}'.format(
-        searchterm, date_tup[0], date_tup[1], page, api_key)
-    response = get(url)
+    payload = {
+        'q': searchterm,
+        'begin_date': date_tup[0],
+        'end_date': date_tup[1],
+        'page': page,
+        'api-key': api_key
+    }
+    url = 'http://api.nytimes.com/svc/search/v2/articlesearch.json'
+    response = get(url, params=payload)
+
     # Make sure you don't hit the 10 calls per second limit
     sleep(1.0 / 10)
     if response.status_code != 200:
@@ -111,18 +117,24 @@ def already_exists(tab, url):
 
 
 if __name__ == '__main__':
+    ''' This script should be called in the following way:
+    $ python nyt_scraper.py 'startdate' 'enddate' 'table (optional)'
+    '''
+
     # Create MongoClient
     client = MongoClient()
     # Initialize the Database
     db = client['election_analysis']
     # Initialize table
-    tab = db['articles']
+    # If a table name has been provided use that, otherwise initialize 'articles' table
+    if len(argv) > 3:
+        tab = db[argv[3]]
+    else:
+        tab = db['articles']
 
     keywords = get_keywords_2016()
-    dates = get_week_tuples(start_mon=12)
-    # Convert dates from YYYY-MM-DD to YYYYMMDD
-    dates = [(date[0].replace('-', ''), date[1].replace('-', ''))
-             for date in dates]
+    start_date, end_date = argv[1], argv[2]
+    dates = get_week_tuples(start_date, end_date, strf='%Y%m%d')
 
     for searchterm in keywords:
         scrape_nyt(tab, searchterm, dates)

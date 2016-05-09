@@ -1,8 +1,9 @@
 from bs4 import BeautifulSoup
 from requests import get
-from load_data import get_keywords_2016, get_dates
+from load_data import get_keywords_2016, get_dates, get_file_name
 import json
 import os
+from sys import argv
 
 
 def single_query(date):
@@ -39,8 +40,16 @@ def get_urls(date, keywords, urls):
 
 
 if __name__=='__main__':
+    ''' This script should be called in the following way:
+    $ python wsj_article_urls.py 'startdate' 'enddate'
+    '''
+
     keywords = get_keywords_2016()
-    dates = get_dates(start_mon=12)
+    start_date, end_date = argv[1], argv[2]
+    print 'Scraping WSJ URLs from {0} to {1}'.format(start_date, end_date)
+
+    # Get dates to search over
+    dates = get_dates(start_date, end_date)
 
     urls = set()
 
@@ -48,6 +57,7 @@ if __name__=='__main__':
         urls = get_urls(date, keywords, urls)
 
     # Convert urls set to a list and write to a txt file
-    with open('./url_files/wsj_article_urls_2015_dec.txt', 'w') as f:
+    file_path = '../url_files/{0}'.format(get_file_name('wsj', start_date, end_date))
+    with open(file_path, 'w') as f:
         f.write(json.dumps(list(urls)))
         f.close()

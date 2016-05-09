@@ -51,21 +51,25 @@ def get_dates(start_date, end_date):
     return date_range
 
 
-def get_week_tuples(start_date, end_date):
+def get_week_tuples(start_date, end_date, strf='%Y-%m-%d'):
     ''' Returns a list of weekly tuples
     INPUT:
         start_date - string in 'YYYY-MM-DD' or 'YYYY-M-DD' format
         end_date - string in 'YYYY-MM-DD' or 'YYYY-M-DD' format
+        strf - string denoting the date format
     OUPUT:
         list of string tuples representing dates at a weekly frequency (except for the first and last which will capture any days that started or ended mid-week) in ('YYYY-MM-DD', 'YYYY-MM-DD') format
     '''
     # Ensure that the date strings are in YYYY-MM-DD format
-    start_date = pd.to_datetime(start_date).strftime('%Y-%m-%d')
-    end_date = pd.to_datetime(end_date).strftime('%Y-%m-%d')
+    start_date = pd.to_datetime(start_date).strftime(strf)
+    end_date = pd.to_datetime(end_date).strftime(strf)
 
     # Create list of dates at a weekly frequency
     date_range = pd.date_range(start_date, end_date, freq='W')
-    date_range = [date.strftime('%Y-%m-%d') for date in date_range]
+    date_range = [date.strftime(strf) for date in date_range]
+
+    if len(date_range) == 0:
+        return [(start_date, end_date)]
 
     # Create a list of weekly tuples that includes both the starting and ending dates
     result = []

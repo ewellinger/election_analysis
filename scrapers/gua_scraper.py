@@ -18,7 +18,7 @@ def single_query(searchterm, date):
         'to-date': date[1],
         'page-size': 200,
         'show-references': 'author',
-        'show-blocks': 'body'
+        'show-blocks': 'body',
         'api-key': api_key
     }
     url = 'http://content.guardianapis.com/search'

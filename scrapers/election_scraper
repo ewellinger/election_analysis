@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# The Purpose of this script is to run all my scrapers in order for a given date range
+# Written by Erich Wellinger
+# github.com/ewellinger/election_analysis
+
+while getopts ":s:e:t:" opt; do
+    case $opt in
+        s)
+            startdate=$OPTARG
+            echo -e "\tStart Date: $startdate"
+            ;;
+        e)
+            enddate=$OPTARG
+            echo -e "\tEnd Date: $enddate"
+            ;;
+        t)
+            table=$OPTARG
+            echo -e "\tTable: $table"
+            ;;
+        \?)
+            echo "usage: scrape_news -s [YYYY-MM-DD (start-date)] -e [YYYY-MM-DD (end-date)] -t [table name (optional)]"
+            ;;
+        :)
+            echo -e "\t Option -$OPTARG requires an argument." >&2
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z ${startdate+x} ]; then
+    echo -e "\tError: You must specify the start-date with the -s flag"
+    exit 1
+fi
+if [ -z ${enddate+x} ]; then
+    echo -e "\tError: You must specify the end-date with the -e flag"
+    exit 1
+fi
+if [ -z ${table+x} ]; then
+    echo -e "\tFOX"
+    time python fox_article_urls.py $startdate $enddate
+    time python fox_scraper.py $startdate $enddate
+
+    echo -e "\tGUA"
+    time python gua_scraper.py $startdate $enddate
+
+    echo -e "\tNPR"
+    time python npr_scraper.py $startdate $enddate
+
+    echo -e "\tNYT"
+    time python nyt_scraper.py $startdate $enddate
+
+    echo -e "\tWSJ"
+    time python wsj_article_urls.py $startdate $enddate
+    time python wsj_scraper.py $startdate $enddate
+else
+    echo -e "\tFOX"
+    time python fox_article_urls.py $startdate $enddate
+    time python fox_scraper.py $startdate $enddate $table
+
+    echo -e "\tGUA"
+    time python gua_scraper.py $startdate $enddate $table
+
+    echo -e "\tNPR"
+    time python npr_scraper.py $startdate $enddate $table
+
+    echo -e "\tNYT"
+    time python nyt_scraper.py $startdate $enddate $table
+
+    echo -e "\tWSJ"
+    time python wsj_article_urls.py $startdate $enddate
+    time python wsj_scraper.py $startdate $enddate $table
+fi
