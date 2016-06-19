@@ -103,14 +103,12 @@ if __name__=='__main__':
     db = client['election_analysis']
     # Initialize table
     # If a table name has been provided use that, otherwise initialize 'articles' table
-    # if len(argv) > 3:
-    #     tab = db[argv[3]]
-    # else:
-    #     tab = db['articles']
-    tab = db['test']
+    if len(argv) > 3:
+        tab = db[argv[3]]
+    else:
+        tab = db['articles']
 
-    # start_date, end_date = argv[1], argv[2]
-    start_date, end_date = '2016-02-01', '2016-02-02'
+    start_date, end_date = argv[1], argv[2]
     print 'Scraping WSJ URLs from {0} to {1}'.format(start_date, end_date)
 
     file_path = '../url_files/{0}'.format(get_file_name('wsj', start_date, end_date))

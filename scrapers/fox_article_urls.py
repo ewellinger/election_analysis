@@ -8,16 +8,6 @@ from sys import argv
 
 def get_urls_from_search(driver, searchterm, date, attempt=0):
     searchterm = searchterm.replace(' ', '%20')
-    # payload = {
-    #     'q': searchterm,
-    #     'ss': 'fn',
-    #     'section.path': 'fnc/politics',
-    #     'type': 'story',
-    #     'min_date': date[0],
-    #     'max_date': date[1],
-    #     'start': 0
-    # }
-    # url = 'http://www.foxnews.com/search-results/search'
     url = 'http://www.foxnews.com/search-results/search?q={0}&ss=fn&section.path=fnc/politics&type=story&min_date={1}&max_date={2}&start=0'.format(searchterm, date[0], date[1])
 
     # Get the html from the site and create a BeautifulSoup object from it
@@ -66,28 +56,28 @@ def get_urls_from_search(driver, searchterm, date, attempt=0):
             return False, url
 
 
-def get_urls(driver, searchterm, dates, good_urls, bad_urls):
+def get_urls(driver, searchterm, dates, good_urls, bad_searches):
     for date in dates:
         response = get_urls_from_search(driver, searchterm, date)
         if response[0]:
             for url in response[1]:
                 good_urls.add(url)
         else:
-            bad_urls.add(response[1])
-    return good_urls, bad_urls
+            bad_searches.add((searchterm, date))
+    return good_urls, bad_searches
 
 
-def thread_get_urls(driver, searchterm, dates, good_urls, bad_urls):
+def thread_get_urls(driver, searchterm, dates, good_urls, bad_searches):
     self = threading.current_thread()
-    self.result = get_urls(driver, searchterm, dates, good_urls, bad_urls)
+    self.result = get_urls(driver, searchterm, dates, good_urls, bad_searches)
 
 
-def concurrent_get_urls(searchterms, dates, good_urls, bad_urls):
+def concurrent_get_urls(searchterms, dates, good_urls, bad_searches):
     threads = []
     drivers = [webdriver.Firefox() for i in xrange(len(searchterms))]
     for idx, searchterm in enumerate(searchterms):
         thread = threading.Thread(target=thread_get_urls,
-                                  args=(drivers[idx], searchterm, dates, good_urls, bad_urls))
+                                  args=(drivers[idx], searchterm, dates, good_urls, bad_searches))
         threads.append(thread)
     for thread in threads:
         thread.start()
@@ -98,10 +88,10 @@ def concurrent_get_urls(searchterms, dates, good_urls, bad_urls):
         results.append(thread.result)
     for result in results:
         good_urls = good_urls.union(result[0])
-        bad_urls = bad_urls.union(result[1])
+        bad_searches = bad_searches.union(result[1])
     for driver in drivers:
         driver.close()
-    return good_urls, bad_urls
+    return good_urls, bad_searches
 
 
 if __name__ == '__main__':
@@ -118,22 +108,38 @@ if __name__ == '__main__':
     dates = get_week_tuples(start_date, end_date)
 
     # Initialize empty lists for urls to be appended to
-    good_urls, bad_urls = set(), set()
+    good_urls, bad_searches = set(), set()
 
     good_urls, bad_urls = concurrent_get_urls(
-        searchterms[0:4], dates, good_urls, bad_urls)
+        searchterms[0:4], dates, good_urls, bad_searches)
     good_urls, bad_urls = concurrent_get_urls(
-        searchterms[4:8], dates, good_urls, bad_urls)
+        searchterms[4:8], dates, good_urls, bad_searches)
     good_urls, bad_urls = concurrent_get_urls(
-        searchterms[8:12], dates, good_urls, bad_urls)
+        searchterms[8:12], dates, good_urls, bad_searches)
     good_urls, bad_urls = concurrent_get_urls(
-        searchterms[12:16], dates, good_urls, bad_urls)
+        searchterms[12:16], dates, good_urls, bad_searches)
     good_urls, bad_urls = concurrent_get_urls(
-        searchterms[16:20], dates, good_urls, bad_urls)
+        searchterms[16:20], dates, good_urls, bad_searches)
     good_urls, bad_urls = concurrent_get_urls(
-        searchterms[20:], dates, good_urls, bad_urls)
+        searchterms[20:], dates, good_urls, bad_searches)
 
     print 'Fox Scraping Done...'
+    print 'There were a total of {0} failed searches'.format(len(bad_searches))
+
+    # If there were any bad searchs we should try and make some attempts to redo the searchs in a non-threaded way
+    attempt = 0
+    while attempt < 3 and len(bad_searches) > 0:
+        # This will give us a tuple of (searchterm, date tuple) to research over
+        searchterms_and_dates = list(bad_searches)
+        # Reset our bad_searches to an empty set
+        bad_searches = set()
+        # Create a Firefox driver
+        driver = webdriver.Firefox()
+        for searchterm, date in searchterms_and_dates:
+            good_urls, bad_searches = get_urls(driver, searchterm, [date], good_urls, bad_searches)
+        driver.close()
+        attempt += 1
+        print 'Total of {0} failed searches after attempt {1}'.format(len(bad_searches), attempt)
 
     # Convert good_urls set to a list and write to a txt file
     file_path = '../url_files/{0}'.format(get_file_name('fox', start_date, end_date))
@@ -142,11 +148,9 @@ if __name__ == '__main__':
         f.close()
 
     # If there are any bad URLs, print how many there were and write them to a file for review
-    print type(bad_urls)
-    print len(bad_urls)
-    print 'Number of Bad URLs = {0}'.format(len(bad_urls))
-    if len(bad_urls):
+    print 'Number of Bad Searches = {0}'.format(len(bad_searches))
+    if len(bad_searches):
         file_path = '../url_files/{0}'.format(get_file_name('fox', start_date, end_date, bad=True))
         with open(file_path, 'w') as f:
-            f.write(json.dumps(list(bad_urls)))
+            f.write(json.dumps(list(bad_searches)))
             f.close()

@@ -53,6 +53,9 @@ def clean_df(df, columns, keywords, lemmatize_text=True, polarity_threshold=0.1)
         columns.append('subjectivity')
         columns.append('positive')
 
+    # Remove duplicate entrys
+    df = df.drop_duplicates('url')
+
     # Sort by the date_published and reset the index
     df = df.sort_values(by='date_published').reset_index(drop=True)
 

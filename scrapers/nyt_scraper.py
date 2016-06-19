@@ -24,6 +24,7 @@ def single_query(searchterm, date_tup, page=0):
     sleep(1.0 / 10)
     if response.status_code != 200:
         print 'WARNING', response.status_code
+        print response.url
     elif response.json()['status'] != 'OK':
         print 'WARNING', response.json()['status']
     else:
