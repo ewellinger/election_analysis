@@ -212,10 +212,21 @@ def candidate_plots(df, labels, topic_labels, candidate_labels, title, byline=No
         plt.show()
 
 
-def word_cloud(nmf, topic_num, feature_names, max_words=300, figsize=(14, 8), width=2400, height=1300, ax=None, show=True):
-    # Create the WordCloud object
+def topic_word_cloud(nmf, topic_idx, max_words=300, figsize=(14, 8), width=2400, height=1300, ax=None):
+    ''' Create word cloud for a given topic
+    INPUT:
+        nmf: NMFClustering object
+        topic_idx: int
+        max_words: int
+            Max number of words to encorporate into the word cloud
+        figsize: tuple (int, int)
+            Size of the figure if an axis isn't passed
+        width: int
+        height: int
+        ax: None or matplotlib axis object
+    '''
     wc = WordCloud(background_color='white', max_words=max_words, width=width, height=height)
-    word_freq = topic_word_freq(nmf.components_, topic_num, feature_names)
+    word_freq = nmf.topic_word_frequency(topic_idx)
 
     # Fit the WordCloud object to the specific topics word frequencies
     wc.fit_words(word_freq)
@@ -226,8 +237,6 @@ def word_cloud(nmf, topic_num, feature_names, max_words=300, figsize=(14, 8), wi
         ax = fig.add_subplot(111)
     ax.imshow(wc)
     ax.axis('off')
-    if show:
-        plt.show()
 
 
 if __name__=='__main__':

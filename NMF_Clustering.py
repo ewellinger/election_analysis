@@ -4,11 +4,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 from sklearn.decomposition import NMF
 from scrapers.load_data import stop_words
-import matplotlib.pyplot as plt
-from wordcloud import WordCloud
 
 
-class NMFClustering():
+class NMFClustering(object):
     def __init__(self, num_topics, tfidf_max_features=10000, tfidf_max_df=0.8, tfidf_min_df=20, nmf_alpha=0.1, nmf_l1_ratio=0.25, random_state=None):
         self.num_topics = num_topics
         self.tfidf_max_features = tfidf_max_features
@@ -28,15 +26,8 @@ class NMFClustering():
                 Dataframe with a column 'lemmatized_text' which is what will be vectorized.
         Hmm, should I save this dataframe as an attribute?
         '''
-        # First create the Tfidf object and save it as an attribute
-        self.tfidf = TfidfVectorizer(input='content', stop_words=self.stop_words, use_idf=True, lowercase=True, max_features=self.tfidf_max_features, max_df=self.tfidf_max_df, min_df=self.tfidf_min_df)
-
-        # Create the tfidf matrix using the lemmatized text
-        self.tfidf_matrix = self.tfidf.fit_transform(df['lemmatized_text'].values)
-
-        # Save the feature names and a reverse lookup for quickly returning the index of a given word in the feature names array
-        self.tfidf_feature_names = np.array(self.tfidf.get_feature_names())
-        self.tfidf_reverse_lookup = {word: idx for idx, word in enumerate(self.tfidf_feature_names)}
+        # Create our TFIDF matrix
+        self.fit_tfidf(df)
 
         # Create the NMF object and fit it to the tfidf matrix
         self.nmf = NMF(n_components=self.num_topics, alpha=self.nmf_alpha, l1_ratio=self.nmf_l1_ratio, random_state=self.random_state).fit(self.tfidf_matrix)
@@ -50,6 +41,23 @@ class NMFClustering():
 
         # For efficient slicing we will save a sparse boolean array indicating if a given article is at least 10% attributable to a particular topic or not
         self.labels = self.W_percent >= 0.1
+
+
+    def fit_tfidf(self, df):
+        ''' Create a TFIDF matrix using the given dataframe
+        INPUT:
+            df: Pandas Dataframe
+                Dataframe with a column 'lemmatized_text' which is what the TFIDF matrix will be created from
+        '''
+        # First create the Tfidf object and save it as an attribute
+        self.tfidf = TfidfVectorizer(input='content', stop_words=self.stop_words, use_idf=True, lowercase=True, max_features=self.tfidf_max_features, max_df=self.tfidf_max_df, min_df=self.tfidf_min_df)
+
+        # Create the tfidf matrix using the lemmatized text
+        self.tfidf_matrix = self.tfidf.fit_transform(df['lemmatized_text'].values)
+
+        # Save the feature names and a reverse lookup for quickly returning the index of a given word in the feature names array
+        self.tfidf_feature_names = np.array(self.tfidf.get_feature_names())
+        self.tfidf_reverse_lookup = {word: idx for idx, word in enumerate(self.tfidf_feature_names)}
 
 
     def top_words_by_topic(self, n_top_words, topic=None):
@@ -112,33 +120,6 @@ class NMFClustering():
         freq_sum = np.sum(self.nmf.components_[topic_idx])
         frequencies = [val / freq_sum for val in self.nmf.components_[topic_idx]]
         return zip(self.tfidf_feature_names, frequencies)
-
-
-def topic_word_cloud(nmf, topic_idx, max_words=300, figsize=(14, 8), width=2400, height=1300, ax=None):
-    ''' Create word cloud for a given topic
-    INPUT:
-        nmf: NMFClustering object
-        topic_idx: int
-        max_words: int
-            Max number of words to encorporate into the word cloud
-        figsize: tuple (int, int)
-            Size of the figure if an axis isn't passed
-        width: int
-        height: int
-        ax: None or matplotlib axis object
-    '''
-    wc = WordCloud(background_color='white', max_words=max_words, width=width, height=height)
-    word_freq = nmf.topic_word_frequency(topic_idx)
-
-    # Fit the WordCloud object to the specific topics word frequencies
-    wc.fit_words(word_freq)
-
-    # Create the matplotlib figure and axis if they weren't passed in
-    if not ax:
-        fig = plt.figure(figsize=figsize)
-        ax = fig.add_subplot(111)
-    ax.imshow(wc)
-    ax.axis('off')
 
 
 if __name__=='__main__':
