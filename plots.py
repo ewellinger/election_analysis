@@ -2,12 +2,12 @@ import pandas as pd
 import numpy as np
 from datetime import date
 import matplotlib.pyplot as plt
-import seaborn as sns
 from PIL import Image
 from wordcloud import WordCloud
 from cluster import topic_word_freq, nmf_articles, print_topic_summary
 from load_data import get_topic_labels
 from shootings import create_shootings_df
+plt.style.use('ggplot')
 
 
 def plot_candidate_percentages(df, candidates):
