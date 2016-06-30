@@ -2,8 +2,11 @@
 
 <h4>Data Science Capstone Project</h4></center>
 
+
+## Note: I am currently updating the code and adding more detail to the README
+### Should be up by 7/9/2016 so check back soon!
 ---
-The purpose of this project is to scrape a variety of news sites for articles covering the 2016 U.S. Election cycle throughout 2015 as part of the Galvanize Data Science Immersive Capstone Project.  Natural Language Processing analysis will then be done on the text of the articles to see what latent topics are present in the media coverage across a variety of news outlets.  Analysis was primarily done using Non-Negative Matrix Factorization (NMF) for extracting latent topics from the corpus.
+The purpose of this project is to scrape a variety of news sites for articles covering the 2016 U.S. Election cycle as part of the Galvanize Data Science Immersive Capstone Project.  Natural Language Processing analysis will then be done on the text of the articles to see what latent topics are present in the media coverage across a variety of news outlets.  Analysis was primarily done using Non-Negative Matrix Factorization (NMF) for extracting latent topics from the corpus.  Currently data is present from The New York Times, Fox News, The Guardian, NPR, and The Wall Street Journal ranging from January 1st, 2015, to May 15th, 2016, with 21,605 articles in total.
 
 Time permitting, similar analysis will be done on previous general election cycles (e.g. 2007 for the election cycle of Obama's first election).  Future plans for this project include deploying a front facing website for exploring the resulting topics and how the coverage of media outlets differ within topics, as well as how their coverage varies over the course of the year.
 
@@ -12,8 +15,6 @@ Below is an example of one of the latent topics extracted with the [NMF][wiki-nm
 [wiki-nmf]: https://en.wikipedia.org/wiki/Non-negative_matrix_factorization
 
 ![gun_control](./plots/Gun_Control.png "Sample Time Series Graph With WordCloud")
-
-
 
 ---
 
@@ -54,23 +55,23 @@ Other Possible News Outlets To Include:
 
 Candidate      | Announcement Date | Suspension Date
 ---------------|:-----------------:|:--------------:
-Ted Cruz       |    03/23/2015     |       N/A
+Ted Cruz       |    03/23/2015     |   05/03/2016
 Rand Paul      |    04/07/2015     |   02/03/2016
-Marco Rubio    |    04/13/2015     |       N/A
-Ben Carson     |    05/04/2015     |       N/A
-Carly Fiorina  |    05/04/2015     |       N/A
+Marco Rubio    |    04/13/2015     |   03/15/2016
+Ben Carson     |    05/04/2015     |   03/02/2016
+Carly Fiorina  |    05/04/2015     |   02/10/2016
 Mike Huckabee  |    05/05/2015     |   02/01/2016
 Rick Santorum  |    05/27/2015     |   02/03/2016
 George Pataki  |    05/28/2015     |   12/29/2015
 Lindsey Graham |    06/01/2015     |   12/21/2015
 Rick Perry     |    06/04/2015     |   09/11/2015
-Jeb Bush       |    06/15/2015     |       N/A
+Jeb Bush       |    06/15/2015     |   02/20/2016
 Donald Trump   |    06/16/2015     |       N/A
 Bobby Jindal   |    06/24/2015     |   11/17/2015
-Chris Christie |    06/30/2015     |       N/A
+Chris Christie |    06/30/2015     |   02/10/2016
 Scott Walker   |    07/13/2015     |   09/21/2015
-John Kasich    |    07/21/2015     |       N/A
-Jim Gilmore    |    07/30/2015     |       N/A
+John Kasich    |    07/21/2015     |   05/04/2016
+Jim Gilmore    |    07/30/2015     |   02/12/2016
 
 
 #### Democratic
@@ -112,3 +113,48 @@ Cleaning Steps Included:
 ---
 
 ### Text Processing
+
+#### Stop Words
+
+#### Lemmatization
+
+#### TFIDF Matrix
+Quickly go over word count matrices and how they differ from a TFIDF matrix
+
+---
+
+### Non-Negative Matrix Factorization
+Overview of NMF and how it works to decompose our our TFIDF matrix into latent topics.
+
+#### How Does NMF Differ From K-Means Clustering?
+* Doesn't impose a strict clustering
+* K-means isn't deterministic and could potentially converge to non-optimal solutions
+* For my project, I chose to assign a particular article to a topic if it was at least 10% attributable to a topic
+    * What does it mean to have no articles assigned to a topic?
+
+#### How many latent topics should we look for?
+Rundown of the challenges associated with trying to determine the number of topics to factorize into.  Include nmf_similarity plot and give a rundown of the thinking behind it as well as the PCA scree plot that gives another approach to the same question.
+
+---
+
+### `NMFClustering` Class
+Overview of how this class works and a rundown of each of the available methods
+
+---
+
+### Interpreting Topics
+How do we get the label for a topic?  Give a print out of the summary for a particular topic and ask the reader to think about what they think that topic is about.
+Print out another topic that is a "junk" topic which isn't really indicative of anything in particular.
+After determining the number of topics to factorize into, a manual inspection of each of the resulting topics is performed to determine what that topic is about.
+Include a table with each of the topic labels...
+Maybe touch on the challenge of incorporating new data into the analysis.  Topics change, the number of topics that are covered in the political discourse changes, and the order of the resulting topics changes which necessitate performing the analysis over again.  :(
+
+---
+
+### Topics, Topics, Topics!
+Show some of the cooler plots here
+
+---
+
+### Thanks
+Thank people and shit...
