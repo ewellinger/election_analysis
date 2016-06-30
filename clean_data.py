@@ -44,17 +44,21 @@ def clean_df(df, columns, keywords, lemmatize_text=True, polarity_threshold=0.1)
         df['lemmatized_text'] = df['article_text'].apply(lemmatize_article)
         columns.append('lemmatized_text')
 
+        ## This didn't really seem to work all that well so I think I'm going to either drop it entirely or replace it with some other implementatino
         # Use pattern.en.sentiment method for creating columns for polarity, sentiment, and positivity (using polarity_threshold as cutoff between negative/positive)
-        sentiment = df['article_text'].apply(en.sentiment)
-        df['polarity'] = zip(*sentiment)[0]
-        df['subjectivity'] = zip(*sentiment)[1]
-        df['positive'] = df['polarity'] >= polarity_threshold
-        columns.append('polarity')
-        columns.append('subjectivity')
-        columns.append('positive')
+        # sentiment = df['article_text'].apply(en.sentiment)
+        # df['polarity'] = zip(*sentiment)[0]
+        # df['subjectivity'] = zip(*sentiment)[1]
+        # df['positive'] = df['polarity'] >= polarity_threshold
+        # columns.append('polarity')
+        # columns.append('subjectivity')
+        # columns.append('positive')
 
     # Remove duplicate entrys
     df = df.drop_duplicates('url')
+
+    # Fox News seems to reprint some articles multiple times with different URLs but the same headline so we want to remove these from the dateset
+    df = df.drop_duplicates('headline')
 
     # Sort by the date_published and reset the index
     df = df.sort_values(by='date_published').reset_index(drop=True)
