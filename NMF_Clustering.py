@@ -4,12 +4,16 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 from sklearn.decomposition import NMF
 from scrapers.load_data import stop_words
+import cPickle as pickle
 
 
 class NMFClustering(object):
     def __init__(self, num_topics, tfidf_max_features=10000, tfidf_max_df=0.8, tfidf_min_df=20, nmf_alpha=0.1, nmf_l1_ratio=0.25, random_state=42):
-        if isinstance(num_topics, int):
-            self.num_topics = num_topics
+        ''' init docstring
+            Stuff and things
+        '''
+        if isinstance(num_topics, (int, float)):
+            self.num_topics = int(num_topics)
         else:
             raise ValueError('num_topics must be an int')
         self.tfidf_max_features = tfidf_max_features
@@ -131,4 +135,7 @@ if __name__=='__main__':
     nmf.fit(df)
 
     # Print a summary of the first topic
-    nmf.print_topic_summary(df, 0)
+    # nmf.print_topic_summary(df, 0)
+
+    with open('NMFClusteringObj.pkl', 'w') as f:
+        pickle.dump(nmf, f)
