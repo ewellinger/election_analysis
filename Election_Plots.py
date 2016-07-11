@@ -3,10 +3,11 @@ import numpy as np
 from datetime import date
 import matplotlib.pyplot as plt
 from PIL import Image
-from NMF_Clustering import NMFClustering
 from wordcloud import WordCloud, ImageColorGenerator
 from scipy.misc import imread
-from scrapers.load_data import get_topic_labels
+import cPickle as pickle
+from NMF_Clustering import NMFClustering
+from scrapers.load_data import get_topic_labels, get_candidate_info
 plt.style.use('ggplot')
 
 
@@ -33,11 +34,25 @@ class ElectionPlotting(object):
             raise ValueError("You must either supply a NMFClustering object or specify the number of topics!")
         self.labels = get_topic_labels()
         self.outlet_sizes = [len(df.loc[df['source'] == outlet]) for outlet in zip(*self.nmf.outlets)[0]]
+        self.candidate_info = get_candidate_info()
         self.frequency = {'D': 'Daily', 'W': 'Weekly', 'M': 'Monthly'}
         self.figsize = figsize
 
 
-    def article_count_by_time(self, searchterm=None, topic_num=None, source=False, freq='W', normalize=False, marker='o', year=False, fig=None, label=None, legend_label=None):
+    def article_count_by_time(self, topic_num=None, searchterm=None, source=False, freq='W', normalize=False, marker='o', year=False, fig=None, title=None, legend_label=None):
+        ''' Creates a plot of articles over time by count or frequency
+        INPUT:
+            topic_num: int (default None)
+            searchterm: str (default None)
+            source: bool (default False)
+            freq: 'D', 'W', or 'M' (default 'W')
+            normalize: bool (default False)
+            marker
+            year
+            fig
+            title
+            legend_label
+        '''
         if isinstance(fig, tuple):
             fig = self._create_fig(fig)
         elif not fig:
@@ -78,10 +93,12 @@ class ElectionPlotting(object):
                 ts.plot(marker=marker)
             plt.xlabel('Date Published ({})'.format(self.frequency[freq]), fontsize=12)
             plt.ylabel('Article Count (freq={})'.format(freq), fontsize=12)
-        if label:
+        if topic_num:
             plt.title('Topic Number {}: {}'.format(topic_num, label))
-        if searchterm:
+        elif searchterm:
             plt.title("Articles Containing '{}'".format(searchterm), fontsize=14)
+        elif title:
+            plt.title(title)
         plt.subplots_adjust(left=0.06, bottom=0.1, right=0.97, top=0.92)
 
         # Adjust the date range for the x-axis to allow for two weeks on either side.  If year is set to True, show from the beginning to the end of the minimum and maximum years respectively
@@ -125,7 +142,7 @@ class ElectionPlotting(object):
             fig = self._create_fig()
 
         for candidate in candidate_topic_idxs:
-            self.article_count_by_time(topic_num=candidate, freq=freq, legend_label=self.labels.get(candidate, 'Unknown'), fig=fig, year=None)
+            self.article_count_by_time(topic_num=candidate, freq=freq, legend_label=True, fig=fig, year=None)
 
         # Make sure the xlims have a buffer on either side of earliest and latest values
         xmin, xmax = plt.xlim()
@@ -141,7 +158,7 @@ class ElectionPlotting(object):
             plt.title(byline, fontsize=10)
 
 
-    def topic_word_cloud(self, topic_num, max_words=300, figsize=None, width=2400, height=1300, ax=None, mask_fname=None, inherit_color=False):
+    def topic_word_cloud(self, topic_num, max_words=200, figsize=None, width=2400, height=1300, ax=None, mask_fname=None, inherit_color=False):
         ''' Create word cloud for a given topic
         INPUT:
             topic_idx: int
@@ -229,7 +246,7 @@ class ElectionPlotting(object):
         fig = self._create_fig(figsize=(14, 8.5), watermark=False)
 
         ax1 = fig.add_axes([0.05, 0.5, 0.93, 0.41])
-        self.article_count_by_time(topic_num=topic_num, source=source, year=year, fig=fig)
+        self.article_count_by_time(topic_num=topic_num, source=source, year=year, fig=fig, legend_label=True)
         ax1.xaxis.labelpad = -4
         plt.title('Number of Articles in Topic: {}'.format(self.nmf.labels[:, topic_num].sum()), x=0.4825)
         if title == None:
@@ -249,11 +266,28 @@ class ElectionPlotting(object):
         return ax1
 
 
+    def single_candidate_plot(self, candidate_last_name):
+        ''' Returns plot associated with a particular candidate
+        Calls ElectionPlotting.topic_time_and_cloud() for the relevant topic_num and adds lines to mark announcement and dropout dates
+        '''
+        topic_num, announce_date, drop_date = self.candidate_info[candidate_last_name.lower()]
+
+        ax = self.topic_time_and_cloud(topic_num)
+
+        if announce_date:
+            ax.axvline(x=pd.to_datetime(announce_date), label='Announcement Date', c='#55a868', lw=3, alpha=0.8)
+        if drop_date:
+            ax.axvline(x=pd.to_datetime(drop_date), label='Withdrawl Date', c='#c44e52', lw=3, alpha=0.8)
+
+        ax.legend(loc='best')
+
+
+
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
 
-    nmf = NMFClustering(250)
-    nmf.fit(df)
+    with open('NMFClusteringObj.pkl') as f:
+        nmf = pickle.load(f)
 
     ep = ElectionPlotting(df, nmf)
 
@@ -268,3 +302,8 @@ if __name__=='__main__':
     # Create an overall visualization of an entire topic
     # ep.topic_time_and_cloud(9)
     # plt.show()
+
+    # Make plot for each candidate and save the image
+    # for candidate in ep.candidate_info.keys():
+    #     ep.single_candidate_plot(candidate)
+    #     plt.savefig('candidate_plots/{}.png'.format(candidate), dpi=300)

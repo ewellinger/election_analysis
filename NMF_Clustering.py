@@ -131,7 +131,7 @@ class NMFClustering(object):
 
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
-    nmf = NMFClustering(100, random_state=42)
+    nmf = NMFClustering(250, random_state=42)
     nmf.fit(df)
 
     # Print a summary of the first topic
