@@ -16,7 +16,7 @@ Below is an example of one of the latent topics extracted with the [NMF][wiki-nm
 
 [wiki-nmf]: https://en.wikipedia.org/wiki/Non-negative_matrix_factorization
 
-![gun_control](./plots/Gun_Control.png "Sample Time Series Graph With WordCloud")
+![gun_control](./plots/topic_plots/gun_control.png "Sample Time Series Graph With WordCloud")
 
 ---
 
@@ -40,8 +40,11 @@ keywords = ['jeb bush', 'carson', 'christie', 'cruz', 'fiorina', 'jim gilmore',
             'sanders', 'jim webb', 'chafee', 'lessig', 'biden']
 ```
 
-All articles that were returned were assumed to be at least cursorily related to the general election (further checks are done to ensure this during the [data cleaning](#data-cleaning) phase) 
-Articles pertaining to the general election were then added to a Mongo Database with metadata and article text for further analysis.  In the case of the Fox News and Wall Street Journal scrapers, relevant url addresses were first saved to a text file prior to extracting metadata and article text.
+All articles that were returned were assumed to be at least cursorily related to the general election (further checks are done to ensure this during the [data cleaning](#data-cleaning) phase) and were then added to a Mongo Database with metadata and article text for further analysis.  In the case of the Fox News and Wall Street Journal scrapers, relevant url addresses were first saved to a text file prior to extracting metadata and article text.
+
+All scripts associated with collecting the data are located in the [scrapers](./scrapers) folder.
+
+Now let's take a look at the plethora of candidates we had to choose from when the race was first getting started!
 
 ---
 
@@ -83,22 +86,29 @@ Joe Biden       |        N/A        |   10/21/2015
 
 Below we can see how the media coverage of topics associated with particular candidates compare over the course of the election season.  For brevity, only a select few candidates will be shown for each plot.
 
-![republican_candidates](./candidate_plots/republican.png "Coverage of Top 5 Polling Republican Candidates As Of February 1st, 2016")
+![democratic_candidates](./candidate_plots/democrat.png "Coverage of the Remaining Two Candidates")
 
+**NOTE**: It may appear that Hillary Clinton has a relatively few number of articles associated with her topic, but that actually isn't the case.  Due to the media storm around certain aspects of Clinton's candidacy, the NMF algorithm factored the general "Hillary Clinton" topic into multiple topics associated with different aspects of her bid for the Presidency.  For example, topics exist related to her use of a private email server (Topics 3, 4, 198), the Clinton Foundation (Topic 51), and the investigation surrounding the Benghazi attack (Topics 30, 98, 222).  We will see later what it means for a more general subject, such as the Benghazi attack, to be factored into multiple topics.
 
-![democratic_candidates](./candidate_plots/democrat.png "Coverage of Remaining Democratic Candidates As Of February 1st, 2016")
+![republican_candidates](./candidate_plots/republican.png "Coverage of the Final Three Republican Candidates")
 
-We can then take a look at each candidate's topic in turn and overlay the dates in which they announced and, if applicable, withdrew their candidacy.  A word cloud indicating the most prominent words for that topic and a breakdown of how prevalently particular news sources were reporting on it are also provided.  For a breakdown of each candidate please refer to the [candidate_plots](./candidate_plots) folder.
+We can then take a look at each candidate's topic in turn and overlay the dates in which they announced and, if applicable, withdrew their candidacy.  A word cloud indicating the most prominent words for that topic and a breakdown of how prevalently particular news sources were reporting on it are also provided (this bar chart is normalized by how many articles that that outlet has in the corpus to account for the sheer volume of articles published).  For a breakdown of each candidate, please refer to the [candidate_plots](./candidate_plots) folder.
 
-**** Imbed some candidate plots here
+![](./candidate_plots/trump.png "Donald Trump Topic")
 
-**NOTE**: It may appear that Hillary Clinton has a relatively few number of articles associated with her topic, but that actually isn't the case.  Due to the media storm around certain aspects of Clinton's candidacy, the NMF algorithm factored the general "Hillary Clinton" topic into multiple topics associated with different aspects of her bid for the Presidency.  For example, topics exist related to her use of a private email server (Topics 3, 4, 198), the Clinton Foundation (Topic 51), and the committee to investigate the Benghazi attack (Topics 30, 98, 222).  We will see later what it means for a more general subject, such as the Benghazi attack, to be factored into multiple topics.
+![](./candidate_plots/carson.png "Ben Carson Topic")
+
+![](./candidate_plots/sanders.png "Bernie Sanders Topic")
+
+![](./candidate_plots/fiorina.png "Carly Fiorina Topic")
+
+![](./candidate_plots/kasich.png "John Kasich Topic")
 
 ---
 
 ### Data Cleaning
 
-Several data cleaning steps were taken in the `clean_data.py` script to read in the data from the Mongo Database and produce the final `pandas` dataframe which the analysis was conducted on.  The resulting dataframe was pickled for easy access in subsequent scripts.
+Several data cleaning steps were taken in the [`clean_data.py`](./clean_data.py) script to read in the data from the Mongo Database and produce the final `pandas` dataframe which the analysis was conducted on.  The resulting dataframe was pickled for easy access in subsequent scripts.
 
 Cleaning Steps Included:
 * Convert `date_published` to the proper datetime format
@@ -106,19 +116,35 @@ Cleaning Steps Included:
 * Parse unicode characters from article text
 * Filter out any articles whose article text doesn't contain at least one candidate name
 * Text Processing / Lemmatization (See Below)
-* Add sentiment data to dataframe using `pattern.en` [sentiment][pattern-sentiment] function
 
-A article was then assumed to being pertained to the general election if the body of the article contained one or more of the candidate(s) full names (e.g. A search for `sanders` may yield an article about Deion Sanders rather than Bernie Sanders, which should not be included).
+One vitally important step was to double check that an article contained in our Mongo Database did, in fact, pertain in some way to the general election.  This was done by ensuring the body of an article contained one or more of the candidate(s) full names (e.g. A search for `sanders` may yield an article about Deion Sanders rather than Bernie Sanders, which should not be included).
 
-[pattern-sentiment]: http://www.clips.ua.ac.be/pages/pattern-en#sentiment
+It's also important to note that these articles might not necessarily be solely about the upcoming election.  For example, an article may be written about the water crisis in Flint Michigan and a candidate weighs in with their opinion.  While this isn't directly related to the election, it does factor into the political discourse and should therefore be included.  Indeed, topic number 83 is concerning the [Flint Water Crisis](./plots/topic_plots/flint_water_crisis.png).
 
 ---
 
 ### Text Processing
 
+While cleaning your data is an important step in any data science project, there are specific steps that are required when working with text data in order to perform analysis on your results.  Among these text oriented steps include removing stop words, stemming/lemmatizing your text, looking at n-grams, part-of-speech tagging, and creating some sort of numeric representation of the words (e.g. Term Frequency or a TfIdf matrix).  Not all of these steps are necessarily required (in fact several of these options are not implemented in my project) but a quick run down of each is in order.
+
 #### Stop Words
+The first step is to remove [stop words](https://en.wikipedia.org/wiki/Stop_words) from our corpus.  Stop words are words that frequently occur in text which make the language grammatically correct but don't actually lend any meaning to what a particular sentence is conveying.  Because of how common they are in the language and how little meaning they convey, we generally want to drop them entirely from our text corpus.  The following are a handful of examples of stop words that could be removed...
+
+```python
+['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', ...]
+```
+
+This is far from a complete list nor is there a canonical list of what words should be dropped.  Furthermore, there are different sets of stop words for a given language.  For example, the list of english stop words given by the `NLTK` package in python contains 127 words to drop.
+
+Apart from these common words, we should extend our list of stop words based off domain-knowledge associated with whatever text we are analyzing.  For example, I extended these common stop words with words or phrases that are commonly associated with politics/political campaigns by dropping words like `'new york times'`, `'gov'`, `'sen'`, `'rep'`, `'campaign'`, `'candidate'`, & c.  
+
 
 #### Lemmatization
+The next step is to implement some form of [text stemming](https://en.wikipedia.org/wiki/Stemming) or [lemmatization](https://en.wikipedia.org/wiki/Lemmatisation).  At a high level this serves to remove any inflectional endings and morph a word to its base or dictionary form of a word (known as the word's lemma).  Because we are concerned with how frequently a given word occurs, variations on a particular word should be counted as the same entity.  i.e. the words `ran`, `run`, `runs`, and `running` should all be altered to `run`.
+
+There are a variety of packages to accomplish this task including many packaged into the `NLTK` package (e.g. [Porter Stemmer](http://www.nltk.org/_modules/nltk/stem/porter.html), [Snowball Stemmer](http://www.nltk.org/_modules/nltk/stem/snowball.html), [WordNet Lemmatizer](http://www.nltk.org/_modules/nltk/stem/wordnet.html)).  For the purposes of this project, I employed the [lemmatizer](http://www.clips.ua.ac.be/pages/pattern-en#conjugation) packaged into the `pattern` package, which I found to work significantly better than those offered by `NLTK`.  
+
+
 
 #### TFIDF Matrix
 Quickly go over word count matrices and how they differ from a TFIDF matrix

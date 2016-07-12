@@ -1,6 +1,5 @@
 *.pyc
 *.pkl
-topic_plots/
 mass_shootings_2015.csv
 url_files/
 .DS_Store
