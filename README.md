@@ -4,13 +4,15 @@
 
 
 ## Note: I am currently updating the code and adding more detail to the README
-### Should be up by 7/9/2016 so check back soon!
+### Should be up by 7/16/2016 so check back soon!
 ---
-The purpose of this project is to scrape a variety of news sites for articles covering the 2016 U.S. Election cycle as part of the Galvanize Data Science Immersive Capstone Project.  Natural Language Processing analysis will then be done on the text of the articles to see what latent topics are present in the media coverage across a variety of news outlets.  Analysis was primarily done using Non-Negative Matrix Factorization (NMF) for extracting latent topics from the corpus.  Currently data is present from The New York Times, Fox News, The Guardian, NPR, and The Wall Street Journal ranging from January 1st, 2015, to May 15th, 2016, with 21,605 articles in total.
+The purpose of this project is to scrape a variety of news sites for articles relating to the 2016 U.S. Election cycle as part of my Galvanize Data Science Immersive Capstone Project.  Natural Language Processing analysis will then be done on the text of the articles to see what latent topics are present in the media coverage across a variety of news outlets.  Once latent topics are identified, we can look at how certain topics are trending over time and whether certain outlets are reporting on them more prevalently than others.  While predicting a winner would be nice, the ultimate goal of this project is to identify how the media is reporting on the election and not to predict the outcome.
 
-Time permitting, similar analysis will be done on previous general election cycles (e.g. 2007 for the election cycle of Obama's first election).  Future plans for this project include deploying a front facing website for exploring the resulting topics and how the coverage of media outlets differ within topics, as well as how their coverage varies over the course of the year.
+Analysis was primarily done using Non-Negative Matrix Factorization (NMF) for extracting latent topics from the corpus.  Currently data is present from The New York Times, Fox News, The Guardian, NPR, and The Wall Street Journal ranging from January 1st, 2015, to May 15th, 2016, with 21,160 articles in total.
 
-Below is an example of one of the latent topics extracted with the [NMF][wiki-nmf] Algorithm.  This graph shows the number of articles attributed to this topic over the course of 2015, a breakdown of the normalized percentage of coverage by each news outlet, and a word cloud showing the most prominent words associated with this topic.  Following the explanation of the methodology behind the data collection, processing, and analysis, other topics will be explored.
+Future steps could include performing a similar analysis on previous general election cycles (e.g. 2007 for the election cycle of Obama's first election) to identify topics which are perennially present in the coverage of a Presidential election regardless of the candidates or current events.  Twitter data could also be incorporated to compare how social media influences what stories the media reports on (i.e. does the reporting by news outlets drive the discourse on social media or vice-versa?)
+
+Below is an example of one of the latent topics extracted with the [NMF][wiki-nmf] Algorithm.  This graph shows the number of articles attributed to this topic over the course of election cycle (up to May 15th), a breakdown of the normalized percentage of coverage by each news outlet, and a word cloud showing the most prominent words associated with this topic.  Following the explanation of the methodology behind the data collection, processing, and analysis, other topics will be explored.
 
 [wiki-nmf]: https://en.wikipedia.org/wiki/Non-negative_matrix_factorization
 
@@ -20,14 +22,15 @@ Below is an example of one of the latent topics extracted with the [NMF][wiki-nm
 
 ### Web-Scraping Methodology
 
-Web Scraping scripts for each of the included news outlets were written employing the python packages `BeautifulSoup` and `selenium`.  Several of the web-scraping scripts also employ multi-threading techniques for performance boosts.  Currently the dataframe has articles from the following news outlets:
-* Fox News
-* The New York Times (API)
-* The Wall Street Journal
-* The Guardian (API)
-* NPR (API)
+Web Scraping scripts for each of the included news outlets were written employing the python packages `BeautifulSoup` and `selenium`.  Several of the web-scraping scripts also employ multi-threading techniques for performance boosts.  Currently the Dataframe has articles from the following news outlets:
 
-Searches were then performed for each of the following keywords (see below) for each day in a particular time period across each news outlet.  A article was then assumed to being pertained to the general election if the body of the article contained one or more of the candidate(s) full names (e.g. A search for `sanders` may yield an article about Deion Sanders rather than Bernie Sanders, which should not be included).
+* Fox News (5,739 Articles)
+* The New York Times (API) (8,944 Articles)
+* The Wall Street Journal (2,419 Articles)
+* The Guardian (API) (2,863 Articles)
+* NPR (API) (1,195 Articles)
+
+Searches were then performed for each of the following keywords for each day in a particular time period across each news outlet:
 
 ```python
 keywords = ['jeb bush', 'carson', 'christie', 'cruz', 'fiorina', 'jim gilmore',
@@ -37,16 +40,8 @@ keywords = ['jeb bush', 'carson', 'christie', 'cruz', 'fiorina', 'jim gilmore',
             'sanders', 'jim webb', 'chafee', 'lessig', 'biden']
 ```
 
-Articles pertaining to the general election will then be added to a Mongo Database with metadata and article text for further analysis.  In the case of the Fox News and Wall Street Journal scrapers, relevant url addresses were first saved to a text file prior to extracting metadata and article text.
-
-Other Possible News Outlets To Include:
-* USA Today (Waiting for API Access)
-* The Washington Post
-* MSNBC
-* NBC News
-* ~~CNN~~ (No way to scrape)
-* ~~BBC~~ (No good way to scrape, API is only open to BBC Employees)
-* ~~Al Jazeera~~ (No way to scrape)
+All articles that were returned were assumed to be at least cursorily related to the general election (further checks are done to ensure this during the [data cleaning](#data-cleaning) phase) 
+Articles pertaining to the general election were then added to a Mongo Database with metadata and article text for further analysis.  In the case of the Fox News and Wall Street Journal scrapers, relevant url addresses were first saved to a text file prior to extracting metadata and article text.
 
 ---
 
@@ -86,13 +81,18 @@ Jim Webb        |    07/02/2015     |   10/20/2015
 Lawrence Lessig |    09/06/2015     |   11/02/2015
 Joe Biden       |        N/A        |   10/21/2015
 
-Below we can see how the media coverage of select candidates compares over the course of 2015.  For brevity only a select few candidates were included on each plot.
+Below we can see how the media coverage of topics associated with particular candidates compare over the course of the election season.  For brevity, only a select few candidates will be shown for each plot.
 
 ![republican_candidates](./candidate_plots/republican.png "Coverage of Top 5 Polling Republican Candidates As Of February 1st, 2016")
 
 
 ![democratic_candidates](./candidate_plots/democrat.png "Coverage of Remaining Democratic Candidates As Of February 1st, 2016")
 
+We can then take a look at each candidate's topic in turn and overlay the dates in which they announced and, if applicable, withdrew their candidacy.  A word cloud indicating the most prominent words for that topic and a breakdown of how prevalently particular news sources were reporting on it are also provided.  For a breakdown of each candidate please refer to the [candidate_plots](./candidate_plots) folder.
+
+**** Imbed some candidate plots here
+
+**NOTE**: It may appear that Hillary Clinton has a relatively few number of articles associated with her topic, but that actually isn't the case.  Due to the media storm around certain aspects of Clinton's candidacy, the NMF algorithm factored the general "Hillary Clinton" topic into multiple topics associated with different aspects of her bid for the Presidency.  For example, topics exist related to her use of a private email server (Topics 3, 4, 198), the Clinton Foundation (Topic 51), and the committee to investigate the Benghazi attack (Topics 30, 98, 222).  We will see later what it means for a more general subject, such as the Benghazi attack, to be factored into multiple topics.
 
 ---
 
@@ -107,6 +107,8 @@ Cleaning Steps Included:
 * Filter out any articles whose article text doesn't contain at least one candidate name
 * Text Processing / Lemmatization (See Below)
 * Add sentiment data to dataframe using `pattern.en` [sentiment][pattern-sentiment] function
+
+A article was then assumed to being pertained to the general election if the body of the article contained one or more of the candidate(s) full names (e.g. A search for `sanders` may yield an article about Deion Sanders rather than Bernie Sanders, which should not be included).
 
 [pattern-sentiment]: http://www.clips.ua.ac.be/pages/pattern-en#sentiment
 
@@ -148,6 +150,11 @@ Print out another topic that is a "junk" topic which isn't really indicative of 
 After determining the number of topics to factorize into, a manual inspection of each of the resulting topics is performed to determine what that topic is about.
 Include a table with each of the topic labels...
 Maybe touch on the challenge of incorporating new data into the analysis.  Topics change, the number of topics that are covered in the political discourse changes, and the order of the resulting topics changes which necessitate performing the analysis over again.  :(
+
+---
+
+### `ElectionPlotting` Class
+Overview of how this class works and a sampling of what kind of plots can be made.
 
 ---
 
