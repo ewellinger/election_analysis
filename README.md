@@ -20,7 +20,7 @@ Below is an example of one of the latent topics extracted with the [NMF][wiki-nm
 
 ---
 
-### Web-Scraping Methodology
+## Web-Scraping Methodology
 
 Web Scraping scripts for each of the included news outlets were written employing the python packages `BeautifulSoup` and `selenium`.  Several of the web-scraping scripts also employ multi-threading techniques for performance boosts.  Currently the Dataframe has articles from the following news outlets:
 
@@ -48,8 +48,8 @@ Now let's take a look at the plethora of candidates we had to choose from when t
 
 ---
 
-### 2016 Candidates
-#### Republican
+## 2016 Candidates
+### Republican
 
 Candidate      | Announcement Date | Suspension Date
 ---------------|:-----------------:|:--------------:
@@ -72,7 +72,7 @@ John Kasich    |    07/21/2015     |   05/04/2016
 Jim Gilmore    |    07/30/2015     |   02/12/2016
 
 
-#### Democratic
+### Democratic
 
 Candidate       | Announcement Date | Suspension Date
 ----------------|:-----------------:|:--------------:
@@ -106,7 +106,7 @@ We can then take a look at each candidate's topic in turn and overlay the dates 
 
 ---
 
-### Data Cleaning
+## Data Cleaning
 
 Several data cleaning steps were taken in the [`clean_data.py`](./clean_data.py) script to read in the data from the Mongo Database and produce the final `pandas` dataframe which the analysis was conducted on.  The resulting dataframe was pickled for easy access in subsequent scripts.
 
@@ -123,13 +123,13 @@ It's also important to note that these articles might not necessarily be solely 
 
 ---
 
-### Text Processing
+## Text Processing
 
 While cleaning your data is an important step in any data science project, there are specific steps that are required when working with text data in order to perform analysis on your results.  Among these text oriented steps include removing stop words, stemming/lemmatizing your text, looking at n-grams, part-of-speech tagging, and creating some sort of numeric representation of the words (e.g. Term Frequency or a TfIdf matrix).
 
 Not all of these steps are necessarily required (in fact several of these options are not implemented in my project) but a quick run down of each is in order.
 
-#### Stop Words
+### Stop Words
 The first step is to remove [stop words](https://en.wikipedia.org/wiki/Stop_words) from our corpus.  Stop words are words that frequently occur in text which make the language grammatically correct but don't actually lend any meaning to what a particular sentence is conveying.  Because of how common they are in the language and how little meaning they convey, we generally want to drop them entirely from our text corpus.  The following are a handful of examples of stop words that could be removed...
 
 ```python
@@ -141,13 +141,13 @@ This is far from a complete list nor is there a canonical list of what words sho
 Apart from these common words, we should extend our list of stop words based off domain-knowledge associated with whatever text we are analyzing.  For example, I extended these common stop words with words or phrases that are commonly associated with politics/political campaigns by dropping words like `'new york times'`, `'gov'`, `'sen'`, `'rep'`, `'campaign'`, `'candidate'`, & c.  
 
 
-#### Lemmatization
+### Lemmatization
 The next step is to implement some form of [text stemming](https://en.wikipedia.org/wiki/Stemming) or [lemmatization](https://en.wikipedia.org/wiki/Lemmatisation).  At a high level this serves to remove any inflectional endings and morph a word to its base or dictionary form of a word (known as the word's lemma).  Because we are concerned with how frequently a given word occurs, variations on a particular word should be counted as the same entity.  i.e. the words `ran`, `run`, `runs`, and `running` should all be altered to `run`.
 
 There are a variety of packages to accomplish this task including many packaged into the `NLTK` package (e.g. [Porter Stemmer](http://www.nltk.org/_modules/nltk/stem/porter.html), [Snowball Stemmer](http://www.nltk.org/_modules/nltk/stem/snowball.html), [WordNet Lemmatizer](http://www.nltk.org/_modules/nltk/stem/wordnet.html)).  For the purposes of this project, I employed the [lemmatizer](http://www.clips.ua.ac.be/pages/pattern-en#conjugation) packaged into the `pattern` package, which I found to work significantly better than those offered by `NLTK`.  
 
 
-#### Looking at n-grams
+### Looking at n-grams
 When looking text data, we sometimes want to preserve some aspect of the order in which the words originally occurred rather than treating them solely as a bag-of-words.  [N-grams](https://en.wikipedia.org/wiki/N-gram) allow us to incorporate order into how our analysis is done.
 
 For example, we intuitively know that the phrases 'New Jersey' or 'New York Yankees' refer to a specific thing and so it makes sense that these words be kept together.  When using bigrams we would end up with the resulting tokens... `'New Jersey => ('New', 'Jersey')'` and `'New York Yankees' => ('New', 'York'), ('York', 'Yankees')`.
@@ -157,7 +157,7 @@ Whether to use n-grams and what n to choose is one consideration to keep in mind
 **NOTE**: This project didn't incorporate n-grams in the analysis.
 
 
-#### Part-Of-Speech Tagging
+### Part-Of-Speech Tagging
 One other technique to consider when performing Natural Language Processing is altering how you treat a word based off of its part-of-speech (e.g. if the word is a Noun, Verb, Adjective, Adverb, & c.).  For instance, maybe you only run the lemmatization step on words which aren't nouns or you drop any words that aren't a certain part of speech.  It's easy to see that your analysis can get increasingly complex as you incorporate these bits of information.  To see just how powerful this can be, consider [this tutorial](https://spacy.io/docs/tutorials/mark-adverbs) on marking adverbs using the spaCy package.
 
 Various part-of-speech taggers exist which vary in their level of accuracy and the speed in which the tagging can be done.  Currently the most accurate implementation is [Parsey McParseface](https://research.googleblog.com/2016/05/announcing-syntaxnet-worlds-most.html), which is part of Google's SyntaxNet.  Another implementation which provides a robust trade-off between accuracy and speed is [spaCy](https://spacy.io/docs).  Other options include [NLTK](http://www.nltk.org/api/nltk.tag.html) and [pattern](http://www.clips.ua.ac.be/pages/pattern-en#parser).
@@ -165,26 +165,39 @@ Various part-of-speech taggers exist which vary in their level of accuracy and t
 **NOTE**: This project currently doesn't utilize any part-of-speech tagging.  I intend to incorporate the spaCy package into my analysis and compare how the results differ.
 
 
-#### Sentiment
+### Sentiment
+Aspects of sentiment can also be considered when dealing with text data.  The classic example of sentiment analysis is in relation to movie reviews whereby, given the text of a user's movie review, we want to predict whether they liked the movie or not.  While this is a fairly easy task for a person to pick up on, it is much more difficult for a model.  Aspects of language such as sarcasm are exceptionally difficult for a machine to pick up on.
+
+One way of doing this is to assign a rating associated with a word between -1 and 1 indicating where on the scale of negative to positive the word falls.  A word like 'sucks' would be assigned a score close to -1 whereas a word like 'awesome' would be assigned a score close to 1.  The overall measure of sentiment is then averaged across all the words in the document.
+
+In the case of applying sentiment analysis to news coverage, a further layer of ambiguity is added in that there is no label associated with our data.  Thus it is difficult to ascertain how well the sentiment analysis is performing.  Furthermore, some topics are just inherently are more negative than others.  An article about genocide is going to contain more negative words than an article about a politician's fundraising efforts.  Classifying it as being positive/negative is a mixture of both the underlying positivity of the topic as well as the relative positivity of that particular article.
+
+At one point I had incorporated aspects of positivity using the [pattern.en.sentiment](http://www.clips.ua.ac.be/pages/pattern-en#sentiment) function.  I dropped this from my analysis due to the nuances of what this measure was conveying.
 
 
+### TF-IDF Matrix
+The next step for running analysis on your corpus of text data is converting these words into a matrix of numbers.  The most simple form of numeric representation is called a [Term-Frequency](https://en.wikipedia.org/wiki/Document-term_matrix) matrix whereby each column of the matrix is a word, each row is a document, and each cell represents the count of that word in a document.  One issue with this approach is due to the potential difference in document lengths.  A longer article that contains the complete transcript of a political debate is necessarily going to have larger values for the term counts than an article that is only a couple of sentences long.  We could normalize the term counts by the length of a document which would alleviate some of this problem, but we can go further and have the value associated with a document-term be a measure of the importance in relation to the rest of the corpus.
 
+We can achieve this by creating a [Term-Frequency Inverse-Document-Frequency](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) (TF-IDF) matrix.  This is done by multiplying the Term-Frequency by a statistic called the Inverse-Document-Frequency, which is a measure of how much information a word provides.  This is obtained by dividing the total number of documents by the number of documents containing that particular term.  We then take the logarithm of the result.  For a full breakdown of how to calculate this matrix, please refer to the link above.
 
-#### TFIDF Matrix
-Quickly go over word count matrices and how they differ from a TFIDF matrix
+This may seem complicated, but the intuition behind it is pretty straightforward.  If a word appears many times in a particular document, it will receive a large term-frequency score.  But if the word also appears in every other document in your corpus, it clearly doesn't convey anything unique about what that document is about.  Thus, a term will get a high score only if it occurs many times in a document and appears in a small fraction of the corpus.
+
+For this project I utilized the [scikit-learn implementation](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html).  This function, by default, incorporates a euclidean (L2) normalization of the term frequency.  Furthermore I decided to use 5,000 features (words) and discarded any term which appeared in more than 80% or less than 20 articles.
+
 
 ---
 
-### Non-Negative Matrix Factorization
+
+## Non-Negative Matrix Factorization
 Overview of NMF and how it works to decompose our our TFIDF matrix into latent topics.
 
-#### How Does NMF Differ From K-Means Clustering?
+### How Does NMF Differ From K-Means Clustering?
 * Doesn't impose a strict clustering
 * K-means isn't deterministic and could potentially converge to non-optimal solutions
 * For my project, I chose to assign a particular article to a topic if it was at least 10% attributable to a topic
     * What does it mean to have no articles assigned to a topic?
 
-#### How many latent topics should we look for?
+### How many latent topics should we look for?
 Rundown of the challenges associated with trying to determine the number of topics to factorize into.  Include nmf_similarity plot and give a rundown of the thinking behind it as well as the PCA scree plot that gives another approach to the same question.
 
 ---
