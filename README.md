@@ -2,9 +2,6 @@
 
 <h4>Data Science Capstone Project</h4></center>
 
-
-## Note: I am currently updating the code and adding more detail to the README
-### Should be up by 7/16/2016 so check back soon!
 ---
 The purpose of this project is to scrape a variety of news sites for articles relating to the 2016 U.S. Election cycle as part of my Galvanize Data Science Immersive Capstone Project.  Natural Language Processing analysis will then be done on the text of the articles to see what latent topics are present in the media coverage across a variety of news outlets.  Once latent topics are identified, we can look at how certain topics are trending over time and whether certain outlets are reporting on them more prevalently than others.  While predicting a winner would be nice, the ultimate goal of this project is to identify how the media is reporting on the election and not to predict the outcome.
 
@@ -12,11 +9,9 @@ Analysis was primarily done using Non-Negative Matrix Factorization (NMF) for ex
 
 Future steps could include performing a similar analysis on previous general election cycles (e.g. 2007 for the election cycle of Obama's first election) to identify topics which are perennially present in the coverage of a Presidential election regardless of the candidates or current events.  Twitter data could also be incorporated to compare how social media influences what stories the media reports on (i.e. does the reporting by news outlets drive the discourse on social media or vice-versa?)
 
-Below is an example of one of the latent topics extracted with the [NMF][wiki-nmf] Algorithm.  This graph shows the number of articles attributed to this topic over the course of election cycle (up to May 15th), a breakdown of the normalized percentage of coverage by each news outlet, and a word cloud showing the most prominent words associated with this topic.  Following the explanation of the methodology behind the data collection, processing, and analysis, other topics will be explored.
+Below is an example of one of the latent topics extracted with the [NMF][#non-negative-matrix-factorization] Algorithm.  This graph shows the number of articles attributed to this topic over the course of election cycle (up to May 15th), a breakdown of the normalized percentage of coverage by each news outlet, and a word cloud showing the most prominent words associated with this topic.  Following the explanation of the methodology behind the data collection, processing, and analysis, other topics will be explored.
 
-[wiki-nmf]: https://en.wikipedia.org/wiki/Non-negative_matrix_factorization
-
-![gun_control](./plots/topic_plots/gun_control.png "Sample Time Series Graph With WordCloud")
+![gun_control](./plots/topic_plots/17_gun_control.png "Sample Time Series Graph With WordCloud")
 
 ---
 
@@ -53,36 +48,36 @@ Now let's take a look at the plethora of candidates we had to choose from when t
 
 Candidate      | Announcement Date | Suspension Date
 ---------------|:-----------------:|:--------------:
-Ted Cruz       |    03/23/2015     |   05/03/2016
-Rand Paul      |    04/07/2015     |   02/03/2016
-Marco Rubio    |    04/13/2015     |   03/15/2016
-Ben Carson     |    05/04/2015     |   03/02/2016
-Carly Fiorina  |    05/04/2015     |   02/10/2016
-Mike Huckabee  |    05/05/2015     |   02/01/2016
-Rick Santorum  |    05/27/2015     |   02/03/2016
-George Pataki  |    05/28/2015     |   12/29/2015
-Lindsey Graham |    06/01/2015     |   12/21/2015
-Rick Perry     |    06/04/2015     |   09/11/2015
-Jeb Bush       |    06/15/2015     |   02/20/2016
-Donald Trump   |    06/16/2015     |       N/A
-Bobby Jindal   |    06/24/2015     |   11/17/2015
-Chris Christie |    06/30/2015     |   02/10/2016
-Scott Walker   |    07/13/2015     |   09/21/2015
-John Kasich    |    07/21/2015     |   05/04/2016
-Jim Gilmore    |    07/30/2015     |   02/12/2016
+[Ted Cruz](./candidate_plots/cruz.png)       |    03/23/2015     |   05/03/2016
+[Rand Paul](./candidate_plots/paul.png)      |    04/07/2015     |   02/03/2016
+[Marco Rubio](./candidate_plots/rubio.png)    |    04/13/2015     |   03/15/2016
+[Ben Carson](./candidate_plots/carson.png)     |    05/04/2015     |   03/02/2016
+[Carly Fiorina](./candidate_plots/fiorina.png)  |    05/04/2015     |   02/10/2016
+[Mike Huckabee](./candidate_plots/huckabee.png)  |    05/05/2015     |   02/01/2016
+[Rick Santorum](./candidate_plots/santorum.png)  |    05/27/2015     |   02/03/2016
+[George Pataki](./candidate_plots/pataki.png)  |    05/28/2015     |   12/29/2015
+[Lindsey Graham](../candidate_plots/graham.png) |    06/01/2015     |   12/21/2015
+[Rick Perry](./candidate_plots/perry.png)]     |    06/04/2015     |   09/11/2015
+[Jeb Bush](./candidate_plots/bush.png)       |    06/15/2015     |   02/20/2016
+[Donald Trump](./candidate_plots/trump.png)   |    06/16/2015     |       N/A
+[Bobby Jindal](./candidate_plots/jindal.png)   |    06/24/2015     |   11/17/2015
+[Chris Christie](./candidate_plots/christie.png) |    06/30/2015     |   02/10/2016
+[Scott Walker](./candidate_plots/walker.png)   |    07/13/2015     |   09/21/2015
+[John Kasich](./candidate_plots/kasich.png)    |    07/21/2015     |   05/04/2016
+[Jim Gilmore](./candidate_plots/gilmore.png)    |    07/30/2015     |   02/12/2016
 
 
 ### Democratic
 
 Candidate       | Announcement Date | Suspension Date
 ----------------|:-----------------:|:--------------:
-Hillary Clinton |    04/12/2015     |       N/A
-Bernie Sanders  |    04/30/2015     |       N/A
-Martin O'Malley |    05/30/2015     |   02/01/2016
-Lincoln Chafee  |    06/03/2015     |   10/23/2015
-Jim Webb        |    07/02/2015     |   10/20/2015
-Lawrence Lessig |    09/06/2015     |   11/02/2015
-Joe Biden       |        N/A        |   10/21/2015
+[Hillary Clinton](./candidate_plots/clinton.png) |    04/12/2015     |       N/A
+[Bernie Sanders](./candidate_plots/sanders.png)  |    04/30/2015     |       N/A
+[Martin O'Malley](./candidate_plots/omalley.png) |    05/30/2015     |   02/01/2016
+[Lincoln Chafee](./candidate_plots/chafee.png)  |    06/03/2015     |   10/23/2015
+[Jim Webb](./candidate_plots/webb.png)        |    07/02/2015     |   10/20/2015
+[Lawrence Lessig](./candidate_plots/lessig.png) |    09/06/2015     |   11/02/2015
+[Joe Biden](./candidate_plots/biden.png)       |        N/A        |   10/21/2015
 
 Below we can see how the media coverage of topics associated with particular candidates compare over the course of the election season.  For brevity, only a select few candidates will be shown for each plot.
 
@@ -119,7 +114,7 @@ Cleaning Steps Included:
 
 One vitally important step was to double check that an article contained in our Mongo Database did, in fact, pertain in some way to the general election.  This was done by ensuring the body of an article contained one or more of the candidate(s) full names (e.g. A search for `sanders` may yield an article about Deion Sanders rather than Bernie Sanders, which should not be included).
 
-It's also important to note that these articles might not necessarily be solely about the upcoming election.  For example, an article may be written about the water crisis in Flint Michigan and a candidate weighs in with their opinion.  While this isn't directly related to the election, it does factor into the political discourse and should therefore be included.  Indeed, topic number 83 is concerning the [Flint Water Crisis](./plots/topic_plots/flint_water_crisis.png).
+It's also important to note that these articles might not necessarily be solely about the upcoming election.  For example, an article may be written about the water crisis in Flint Michigan and a candidate weighs in with their opinion.  While this isn't directly related to the election, it does factor into the political discourse and should therefore be included.  Indeed, topic number 83 is concerning the [Flint Water Crisis](./plots/topic_plots/83_flint_water_crisis.png).
 
 ---
 
@@ -182,16 +177,27 @@ We can achieve this by creating a [Term-Frequency Inverse-Document-Frequency](ht
 
 This may seem complicated, but the intuition behind it is pretty straightforward.  If a word appears many times in a particular document, it will receive a large term-frequency score.  But if the word also appears in every other document in your corpus, it clearly doesn't convey anything unique about what that document is about.  Thus, a term will get a high score only if it occurs many times in a document and appears in a small fraction of the corpus.
 
-For this project I utilized the [scikit-learn implementation](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html).  This function, by default, incorporates a euclidean (L2) normalization of the term frequency.  Furthermore I decided to use 5,000 features (words) and discarded any term which appeared in more than 80% or less than 20 articles.
+For this project I utilized the [scikit-learn implementation](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html).  This function, by default, incorporates a euclidean (L2) normalization of the term frequency.  Furthermore I decided to use 5,000 features (words) and discarded any term which appeared in more than 75% or less than 20 articles.
 
 
 ---
 
 
 ## Non-Negative Matrix Factorization
-Overview of NMF and how it works to decompose our our TFIDF matrix into latent topics.
+Once we have our TF-IDF matrix, we are ready to run [Non-Negative Matrix Factorization](https://en.wikipedia.org/wiki/Non-negative_matrix_factorization), which is a form of matrix factorization technique similar to PCA/SVD.  It differs from these approaches by imposing a non-negativity constraint, which is an important consideration because our data is inherently non-negative (a term's tf-idf score can only be 0 or greater).  Furthermore, what would it mean for a term to have a negative weight in relation to a particular topic?  i.e. Non-negativity lends itself to a more coherent interpretation of the resulting topic.
+
+When running NMF, we are interested in decomposing our original matrix V into two matrices, W and H, such that, when multiplied together, they approximately recreate our original V matrix.  Our W matrix will then tell us how particular words relate to our latent factors (or topics) and our H matrix will tell us how our latent factors relate to our specific documents (see below)
+
+ ![](./plots/NMF.png)
+
+Thus we can look to the resulting W matrix to get a sense for what words are most associated with a particular latent topic, which in turn tells us what this topic is about (more on this in [later](#interpreting-topics)).  Once we have an idea of what the topic is about we can look to our H matrix to see what articles are most associated with that topic.
+
+The non-negativity constraint also makes the resulting matrices more sparse and thus easier to inspect.  This is in contrast to the result of techniques such as PCA/SVD which may assign some level of attributability for every word per topic/topic per document.  This sparsity makes it particularly attractive when applying to document clustering among other applications.  First, let's take a look at how this differs from other clustering techniques, such as K-means clustering.
+
 
 ### How Does NMF Differ From K-Means Clustering?
+A classic approach when trying to cluster as dataset is [k-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) which aims to partition each observation into one of k clusters
+
 * Doesn't impose a strict clustering
 * K-means isn't deterministic and could potentially converge to non-optimal solutions
 * For my project, I chose to assign a particular article to a topic if it was at least 10% attributable to a topic

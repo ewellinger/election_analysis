@@ -1,14 +1,13 @@
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
 from sklearn.decomposition import NMF
 from scrapers.load_data import stop_words
 import cPickle as pickle
 
 
 class NMFClustering(object):
-    def __init__(self, num_topics, tfidf_max_features=10000, tfidf_max_df=0.8, tfidf_min_df=20, nmf_alpha=0.1, nmf_l1_ratio=0.25, random_state=42):
+    def __init__(self, num_topics, tfidf_max_features=5000, tfidf_max_df=0.75, tfidf_min_df=20, nmf_alpha=0.1, nmf_l1_ratio=0.25, random_state=42):
         ''' init docstring
             Stuff and things
         '''
@@ -31,7 +30,6 @@ class NMFClustering(object):
         INPUT:
             df: Dataframe
                 Dataframe with a column 'lemmatized_text' which is what will be vectorized.
-        Hmm, should I save this dataframe as an attribute?
         '''
         # Create our TFIDF matrix
         self.fit_tfidf(df)
@@ -46,8 +44,8 @@ class NMFClustering(object):
         sums = np.sum(self.W_matrix, axis=1)
         self.W_percent = self.W_matrix / sums[:, None]
 
-        # For efficient slicing we will save a sparse boolean array indicating if a given article is at least 10% attributable to a particular topic or not
-        self.labels = self.W_percent >= 0.1
+        # For efficient slicing we will save a sparse boolean array indicating if a given article is at least 5% attributable to a particular topic or not
+        self.labels = self.W_percent >= 0.05
 
 
     def fit_tfidf(self, df):
@@ -60,7 +58,7 @@ class NMFClustering(object):
         self.tfidf = TfidfVectorizer(input='content', stop_words=self.stop_words, use_idf=True, lowercase=True, max_features=self.tfidf_max_features, max_df=self.tfidf_max_df, min_df=self.tfidf_min_df)
 
         # Create the tfidf matrix using the lemmatized text
-        self.tfidf_matrix = self.tfidf.fit_transform(df['lemmatized_text'].values)
+        self.tfidf_matrix = self.tfidf.fit_transform(df['lemmatized_text'].values).toarray()
 
         # Save the feature names and a reverse lookup for quickly returning the index of a given word in the feature names array
         self.tfidf_feature_names = np.array(self.tfidf.get_feature_names())
@@ -131,7 +129,7 @@ class NMFClustering(object):
 
 if __name__=='__main__':
     df = pd.read_pickle('election_data.pkl')
-    nmf = NMFClustering(250, random_state=42)
+    nmf = NMFClustering(250)
     nmf.fit(df)
 
     # Print a summary of the first topic
