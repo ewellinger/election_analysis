@@ -26,7 +26,7 @@ def single_query(searchterm, date, start_num=0):
     url = 'http://api.npr.org/query'
     response = get(url, params=payload)
     if response.status_code != 200:
-        print 'WARNING', response.status_code
+        print('WARNING', response.status_code)
     else:
         return response.json()
 
@@ -119,12 +119,12 @@ if __name__=='__main__':
         tab = db['articles']
 
     start_date, end_date = argv[1], argv[2]
-    print 'Scraping NPR from {0} to {1}'.format(start_date, end_date)
+    print('Scraping NPR from {0} to {1}'.format(start_date, end_date))
 
     dates = get_dates(start_date, end_date)
     keywords = get_keywords_2016()
 
     num_bad_extractions = concurrent_scrape_npr(tab, keywords, dates)
 
-    print 'NPR Scraping Done...'
-    print 'Number of Bad Extractions = {0}'.format(num_bad_extractions)
+    print('NPR Scraping Done...')
+    print('Number of Bad Extractions = {0}'.format(num_bad_extractions))
