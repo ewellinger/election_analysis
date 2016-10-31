@@ -186,17 +186,53 @@ For this project I utilized the [scikit-learn implementation](http://scikit-lear
 ## Non-Negative Matrix Factorization
 Once we have our TF-IDF matrix, we are ready to run [Non-Negative Matrix Factorization](https://en.wikipedia.org/wiki/Non-negative_matrix_factorization), which is a form of matrix factorization technique similar to PCA/SVD.  It differs from these approaches by imposing a non-negativity constraint, which is an important consideration because our data is inherently non-negative (a term's tf-idf score can only be 0 or greater).  Furthermore, what would it mean for a term to have a negative weight in relation to a particular topic?  i.e. Non-negativity lends itself to a more coherent interpretation of the resulting topic.
 
-When running NMF, we are interested in decomposing our original matrix V into two matrices, W and H, such that, when multiplied together, they approximately recreate our original V matrix.  Our W matrix will then tell us how particular words relate to our latent factors (or topics) and our H matrix will tell us how our latent factors relate to our specific documents (see below)
+When running NMF, we are interested in decomposing our original matrix V into two matrices, W and H, such that, when multiplied together, they approximately recreate our original V matrix.  Our W matrix will then tell us how particular words relate to our latent factors (or topics) and our H matrix will tell us how our latent factors relate to our specific documents (see below).
 
  ![](./plots/NMF.png)
 
-Thus we can look to the resulting W matrix to get a sense for what words are most associated with a particular latent topic, which in turn tells us what this topic is about (more on this in [later](#interpreting-topics)).  Once we have an idea of what the topic is about we can look to our H matrix to see what articles are most associated with that topic.
+Thus we can look to the resulting W matrix to get a sense for what words are most associated with a particular latent topic, which in turn tells us what this topic is about (more on this in [later](#interpreting-topics)).  Once we have an idea of what the topic is about we can look to our H matrix to see what articles are most associated with that topic.  (**NOTE**: The [Scikit-learn implementation](http://scikit-learn.org/stable/modules/generated/sklearn.decomposition.NMF.html) has the original V matrix transposed (documents are rows, words are columns) and thus the interpretation of W and H are backwards.  W relates documents to topics and H relates topics to words)
 
 The non-negativity constraint also makes the resulting matrices more sparse and thus easier to inspect.  This is in contrast to the result of techniques such as PCA/SVD which may assign some level of attributability for every word per topic/topic per document.  This sparsity makes it particularly attractive when applying to document clustering among other applications.  First, let's take a look at how this differs from other clustering techniques, such as K-means clustering.
 
 
 ### How Does NMF Differ From K-Means Clustering?
-A classic approach when trying to cluster as dataset is [k-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) which aims to partition each observation into one of k clusters
+A classic approach when trying to cluster as dataset is [k-means clustering](https://en.wikipedia.org/wiki/K-means_clustering) which aims to partition each observation into one of k clusters based on its distance to the cluster centroid.  While there are drastic differences in how each of these algorithms work, it is useful to point out how they differ in regard to how a document is assigned to a particular cluster/topic.
+
+K-means clustering imposes a strict clustering on your documents (i.e. a document is assigned to one, and only one, cluster depending on its distance).  For example we may have a document that is sitting on the outskirts of two clusters/topics.  It will then be assigned as "belonging" completely to whichever one is closer, however slightly.  This may, or may not, be a desired property depending on the domain in which it is being applied.
+
+In contrast, the NMF algorithm allows for a soft clustering (i.e. a document will be assigned a spectrum of "attributability" associated with each cluster/topic).  Thus we can have a document be assigned to multiple topics depending on where on the spectrum of association it is for each topic.  For example we may have a document that is about the current state of fundraising efforts for the Trump and Clinton campaigns.  It makes intuitive sense that we would allow this document to be assigned to the Donald Trump topic, Hillary Clinton topic, and the fundraising topic rather than only assigning it to one.
+
+As a concrete example, let's suppose we have a corpus that is factorized into 10 latent topics and we are looking at the first document.  To find the attributability for that particular document across the 10 topics we would look the first row of our W matrix like so...
+
+```python
+from NMF_Clustering import NMFClustering
+
+nmf = NMFClustering(10)
+nmf.fit(df)
+print nmf.W_matrix[0, :]
+```
+
+This would output the following...
+
+```python
+[ 0.0329107   0.00235708  0.          0.0014467   0.          
+  0.          0.0007864   0.00722944  0.          0.        ]
+```
+
+We can tell a variety of things right off the bat from this array.  First of all, it's clear that the result is pretty sparse.  No amount of attributability was given for topics 2, 4, 5, 8, and 9.  Secondly, it's clear these attributions don't correspond to a particular unit.  We could get a percentage attribution by dividing each value by the sum of all the values which would yield the following:
+
+```python
+[ 0.73575821  0.05269539  0.          0.03234268  0.          
+  0.          0.01758088  0.16162284  0.          0.        ]
+```
+
+We can grab these percentage attributions by looking at `nmf.W_percent[0, :]` (more on this `NMFClustering` class [here](#nmfclustering-class)).  This tells us that this particular document is approximately 73% attributable to topic 0, 5% attributable to topic 1, 3% attributable to topic 3, 1% attributable to topic 6, and 16% attributable to topic 7.  
+
+The next logical question is, given this array of percentages, what topics do we associate this document with?  The constructor of the `NMFClustering` class accepts a hyperparameter `percent_threshold` which sets a threshold for where the cutoff should be.  Setting this to a higher percentage will result in a topic being associated with a smaller number of topics.  For example, setting this to 10% would allow a document to be associated with a maximum of 10 topics.  For the purposes of my analysis, I set the threshold to 5%.  Setting this too much higher resulted in a significant number of articles being attributed to no topics at all.
+
+
+
+
 
 * Doesn't impose a strict clustering
 * K-means isn't deterministic and could potentially converge to non-optimal solutions
@@ -234,3 +270,25 @@ Show some of the cooler plots here
 
 ### Thanks
 Thank people
+
+For brevity I've factorized into 10 latent topics to show what the result for a particular document might look like.  Below is what the raw output might look like (it would be 250 long for my chosen number of topics)...
+```python
+[ 0.03197828,  0.00194879,  0.        ,  0.        ,  0.        ,
+  0.00065598,  0.        ,  0.00601818,  0.        ,  0.00136828]
+```
+Clearly these attributions don't correspond to a particular unit.  We could get a percentage attribution by dividing each value by the sum of all the values which would yield the following:
+```python
+[ 0.76194074,  0.0464334 ,  0.        ,  0.        ,  0.        ,
+  0.01563002,  0.        ,  0.14339412,  0.        ,  0.03260172]
+```
+
+
+```python
+for topic in sorted(ep.labels.keys()):
+    print '{} | {} | {}'.format(topic, ep.labels[topic], np.sum(nmf.labels[:, topic]))
+```
+
+
+
+http://www.ncbi.nlm.nih.gov/pubmed/24467759
+"the effect of the data noise on the stability of the factorization and the convergence of the algorithm are unknown"
